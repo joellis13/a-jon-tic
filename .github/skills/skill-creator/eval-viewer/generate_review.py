@@ -287,6 +287,28 @@ def generate_html(
 
 def _kill_port(port: int) -> None:
     """Kill any process listening on the given port."""
+    if sys.platform == "win32":
+        try:
+            result = subprocess.run(
+                ["netstat", "-ano"],
+                capture_output=True, text=True, timeout=5,
+            )
+            for line in result.stdout.splitlines():
+                if f":{port}" in line and "LISTENING" in line:
+                    parts = line.split()
+                    pid = parts[-1] if parts else ""
+                    if pid.isdigit() and int(pid) > 0:
+                        try:
+                            subprocess.run(
+                                ["taskkill", "/F", "/PID", pid],
+                                capture_output=True, timeout=5,
+                            )
+                        except OSError:
+                            pass
+            time.sleep(0.5)
+        except (subprocess.TimeoutExpired, OSError):
+            pass
+        return
     try:
         result = subprocess.run(
             ["lsof", "-ti", f":{port}"],

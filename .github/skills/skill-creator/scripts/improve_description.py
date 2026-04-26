@@ -144,7 +144,11 @@ Please respond with only the new description text in <new_description> tags, not
     text = _call_claude(prompt, model)
 
     match = re.search(r"<new_description>(.*?)</new_description>", text, re.DOTALL)
-    description = match.group(1).strip().strip('"') if match else text.strip().strip('"')
+    if match:
+        description = match.group(1).strip().strip('"')
+    else:
+        print("Warning: model response did not include <new_description> tags; using raw response as description", file=sys.stderr)
+        description = text.strip().strip('"')
 
     transcript: dict = {
         "iteration": iteration,
