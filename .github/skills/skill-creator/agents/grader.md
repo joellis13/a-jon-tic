@@ -123,7 +123,7 @@ Write a JSON file with this structure:
     {
       "text": "The assistant used the skill's OCR script",
       "passed": true,
-      "evidence": "Transcript Step 2 shows: 'Tool: Bash - python ocr_script.py image.png'"
+      "evidence": "Transcript Step 2 shows: 'Tool: powershell - python ocr_script.py image.png'"
     }
   ],
   "summary": {
@@ -134,9 +134,9 @@ Write a JSON file with this structure:
   },
   "execution_metrics": {
     "tool_calls": {
-      "Read": 5,
-      "Write": 2,
-      "Bash": 8
+      "view": 5,
+      "create": 2,
+      "powershell": 8
     },
     "total_tool_calls": 15,
     "total_steps": 6,
