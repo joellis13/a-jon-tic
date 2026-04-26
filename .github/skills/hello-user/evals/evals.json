@@ -1,0 +1,41 @@
+{
+  "skill_name": "hello-user",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Hello!",
+      "expected_output": "ASCII art greeting saying 'Hello, <current username>!' using the standard figlet font via the hello_ascii.py script",
+      "files": [],
+      "expectations": [
+        "The output contains ASCII art (multi-line text made of characters like |, _, /, \\)",
+        "The greeting includes the actual system username (not a placeholder like 'User' unless that is the real username)",
+        "The word 'Hello' appears in the ASCII art",
+        "The output is wrapped in a code block to preserve spacing"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Hey Copilot, how's it going?",
+      "expected_output": "ASCII art greeting saying 'Hello, <current username>!' — the skill should trigger even on casual greetings",
+      "files": [],
+      "expectations": [
+        "The output contains ASCII art (multi-line text made of characters like |, _, /, \\)",
+        "The greeting includes the actual system username",
+        "The word 'Hello' appears in the ASCII art",
+        "The output is wrapped in a code block to preserve spacing"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Hello copilot",
+      "expected_output": "ASCII art greeting for the current user, consistent style with other eval outputs (same figlet font)",
+      "files": [],
+      "expectations": [
+        "The output contains ASCII art (multi-line text made of characters like |, _, /, \\)",
+        "The greeting includes the actual system username",
+        "The style matches the standard figlet font (vertical bars, underscores, slashes — not emoji or plain text)",
+        "The output is wrapped in a code block to preserve spacing"
+      ]
+    }
+  ]
+}

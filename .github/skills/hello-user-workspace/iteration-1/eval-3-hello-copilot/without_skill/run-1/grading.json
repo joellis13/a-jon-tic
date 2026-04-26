@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "Output contains multi-line ASCII art (characters like |, _, /, \\)",
+      "passed": false,
+      "evidence": "Plain text: 'Hello! How can I help you today?'"
+    },
+    {
+      "text": "The word 'Hello' appears somewhere in the output",
+      "passed": true,
+      "evidence": "Output starts with 'Hello!'"
+    },
+    {
+      "text": "Output includes the actual system username",
+      "passed": false,
+      "evidence": "Generic response with no username \u2014 'How can I help you today?' contains no 'joell'."
+    },
+    {
+      "text": "ASCII art uses the standard figlet style",
+      "passed": false,
+      "evidence": "Plain text, no ASCII art at all."
+    },
+    {
+      "text": "Output is wrapped in a fenced code block",
+      "passed": false,
+      "evidence": "Plain text, no code block."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 4,
+    "total": 5,
+    "pass_rate": 0.2
+  },
+  "execution_metrics": {
+    "total_tool_calls": 2,
+    "total_steps": 1,
+    "errors_encountered": 0
+  },
+  "timing": {
+    "total_duration_seconds": 12.0
+  }
+}

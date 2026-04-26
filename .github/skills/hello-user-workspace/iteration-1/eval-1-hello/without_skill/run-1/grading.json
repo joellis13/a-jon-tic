@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Output contains multi-line ASCII art (characters like |, _, /, \\)",
+      "passed": false,
+      "evidence": "Output is plain text: 'Hello, joell! Great to meet you. How can I help you today?'"
+    },
+    {
+      "text": "The word 'Hello' appears somewhere in the output",
+      "passed": true,
+      "evidence": "Output starts with 'Hello, joell!'"
+    },
+    {
+      "text": "Output includes the actual system username (not a generic placeholder like 'User')",
+      "passed": true,
+      "evidence": "'joell' appears in 'Hello, joell!'"
+    },
+    {
+      "text": "Output is wrapped in a fenced code block",
+      "passed": false,
+      "evidence": "Plain text response, no code block."
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 2,
+    "total": 4,
+    "pass_rate": 0.5
+  },
+  "execution_metrics": {
+    "total_tool_calls": 2,
+    "total_steps": 1,
+    "errors_encountered": 0
+  },
+  "timing": {
+    "total_duration_seconds": 54.0
+  }
+}

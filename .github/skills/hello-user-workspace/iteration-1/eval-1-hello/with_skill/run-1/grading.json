@@ -1,0 +1,55 @@
+{
+  "expectations": [
+    {
+      "text": "Output contains multi-line ASCII art (characters like |, _, /, \\)",
+      "passed": true,
+      "evidence": "Output has 7 lines of |, _, /, \\ characters forming a figlet-rendered greeting"
+    },
+    {
+      "text": "The word 'Hello' appears somewhere in the output",
+      "passed": false,
+      "evidence": "'Hello' does not appear as literal text \u2014 it is encoded in the ASCII art rendering. ASSERTION DESIGN ISSUE: text search is not appropriate for ASCII art."
+    },
+    {
+      "text": "Output includes the actual system username (not a generic placeholder like 'User')",
+      "passed": false,
+      "evidence": "'joell' does not appear as literal text \u2014 it is encoded in the ASCII art. ASSERTION DESIGN ISSUE: same problem."
+    },
+    {
+      "text": "Output is wrapped in a fenced code block",
+      "passed": false,
+      "evidence": "output.txt contains only the raw ASCII art; code fence was present in the agent's chat response but not persisted to file. ASSERTION DESIGN ISSUE: should check agent response, not saved file."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 3,
+    "total": 4,
+    "pass_rate": 0.25
+  },
+  "execution_metrics": {
+    "total_tool_calls": 4,
+    "total_steps": 3,
+    "errors_encountered": 0
+  },
+  "timing": {
+    "total_duration_seconds": 74.0
+  },
+  "eval_feedback": {
+    "suggestions": [
+      {
+        "assertion": "The word 'Hello' appears somewhere in the output",
+        "reason": "ASCII art encodes text visually \u2014 literal string search always fails for art. Better: verify by running hello_ascii.py and checking the rendered shape, or check the agent's response transcript."
+      },
+      {
+        "assertion": "Output includes the actual system username",
+        "reason": "Same issue \u2014 username is rendered in art, not literal text."
+      },
+      {
+        "assertion": "Output is wrapped in a fenced code block",
+        "reason": "The saved output.txt is just the art content; the code fence exists in the agent's chat response. Either save the full response, or check the transcript instead."
+      }
+    ],
+    "overall": "3 of 4 assertions fail not because the skill is wrong, but because text-search assertions don't work on ASCII art. The skill produces correct, consistent output. Recommend replacing those assertions with: (1) line count check, (2) script-execution cross-check, (3) figlet-style pattern match."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "skill_used": "hello-user",
+  "characters": 262,
+  "lines": 6,
+  "username_detected": "joell",
+  "script": "scripts/hello_ascii.py"
+}

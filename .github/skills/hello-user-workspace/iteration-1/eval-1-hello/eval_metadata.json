@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-1-hello",
+  "prompt": "Hello!",
+  "assertions": [
+    {
+      "text": "Output contains multi-line ASCII art (characters like |, _, /, \\)",
+      "passed": null,
+      "evidence": null
+    },
+    {
+      "text": "The word 'Hello' appears somewhere in the output",
+      "passed": null,
+      "evidence": null
+    },
+    {
+      "text": "Output includes the actual system username (not a generic placeholder like 'User' unless that IS the real username)",
+      "passed": null,
+      "evidence": null
+    },
+    {
+      "text": "Output is wrapped in a fenced code block",
+      "passed": null,
+      "evidence": null
+    }
+  ]
+}

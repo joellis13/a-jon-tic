@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-2-hey-copilot",
+  "prompt": "Hey Copilot, how's it going?",
+  "assertions": [
+    {
+      "text": "Output contains multi-line ASCII art (characters like |, _, /, \\)",
+      "passed": null,
+      "evidence": null
+    },
+    {
+      "text": "The word 'Hello' appears somewhere in the output (skill triggers even on non-'hello' greetings)",
+      "passed": null,
+      "evidence": null
+    },
+    {
+      "text": "Output includes the actual system username",
+      "passed": null,
+      "evidence": null
+    },
+    {
+      "text": "Output is wrapped in a fenced code block",
+      "passed": null,
+      "evidence": null
+    }
+  ]
+}
