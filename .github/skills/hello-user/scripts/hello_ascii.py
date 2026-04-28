@@ -25,12 +25,14 @@ def get_username(override: str | None = None) -> str:
     # Last resort: ask the OS.
     try:
         result = subprocess.run(
-            ["whoami"], capture_output=True, text=True, timeout=5
+            ["whoami"], capture_output=True, text=True, timeout=5, check=True
         )
         name = result.stdout.strip()
+        if not name:
+            return "User"
         # Windows returns DOMAIN\username — keep only the username part.
         return name.split("\\")[-1] if "\\" in name else name
-    except Exception:
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError):
         return "User"
 
 
@@ -46,7 +48,7 @@ def render(text: str) -> str:
         return pyfiglet.figlet_format(text, font="standard")
     except ImportError:
         bar = "=" * (len(text) + 4)
-        return f"\n{bar}\n  {text}  \n{bar}\n"
+        return f"{bar}\n  {text}  \n{bar}\n"
 
 
 def main() -> None:

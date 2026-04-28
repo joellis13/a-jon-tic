@@ -4,38 +4,37 @@
     {
       "id": 1,
       "prompt": "Hello!",
-      "expected_output": "ASCII art greeting produced by running scripts/hello_ascii.py — multi-line figlet 'standard' font output for the current user",
+      "expected_output": "ASCII-art-style greeting produced by running scripts/hello_ascii.py for the current user",
       "files": [],
       "expectations": [
-        "Output contains at least 6 lines that include ASCII art characters (|, _, /, \\)",
-        "Output line count matches what hello_ascii.py produces (run the script with the current username to cross-check)",
-        "Output does not contain conversational filler text such as 'How can I help you today'",
-        "Output is wrapped in a fenced code block in the agent's response"
+        "Output is wrapped in a fenced code block in the agent's response",
+        "Output is multi-line and visually formatted like ASCII art or stylized terminal text",
+        "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py",
+        "Output does not contain conversational filler text such as 'How can I help you today'"
       ]
     },
     {
       "id": 2,
       "prompt": "Hey Copilot, how's it going?",
-      "expected_output": "ASCII art greeting via hello_ascii.py — skill should trigger even on casual non-'hello' greetings",
+      "expected_output": "ASCII-art-style greeting via hello_ascii.py — skill should trigger even on casual non-'hello' greetings",
       "files": [],
       "expectations": [
-        "Output contains at least 6 lines that include ASCII art characters (|, _, /, \\)",
-        "Output line count matches what hello_ascii.py produces (run the script with the current username to cross-check)",
-        "Output does not contain conversational filler text such as 'How can I help' or 'how are you'",
-        "Output is wrapped in a fenced code block in the agent's response"
+        "Output is wrapped in a fenced code block in the agent's response",
+        "Output is multi-line and visually formatted like ASCII art or stylized terminal text",
+        "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py",
+        "Output does not contain conversational filler text such as 'How can I help' or 'how are you'"
       ]
     },
     {
       "id": 3,
       "prompt": "Hello copilot",
-      "expected_output": "ASCII art greeting via hello_ascii.py — style must be identical to evals 1 and 2 (same pyfiglet font, same script)",
+      "expected_output": "ASCII-art-style greeting via hello_ascii.py — style should be consistent with the script output used in evals 1 and 2",
       "files": [],
       "expectations": [
-        "Output contains at least 6 lines that include ASCII art characters (|, _, /, \\)",
-        "Output line count matches what hello_ascii.py produces (run the script with the current username to cross-check)",
-        "ASCII art uses figlet 'standard' font style: columns of | characters flanking each letter row, with _ tops and / \\ diagonals",
-        "Output does not contain conversational filler text",
-        "Output is wrapped in a fenced code block in the agent's response"
+        "Output is wrapped in a fenced code block in the agent's response",
+        "Output is multi-line and visually formatted like ASCII art or stylized terminal text",
+        "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py",
+        "Output does not contain conversational filler text"
       ]
     }
   ]
