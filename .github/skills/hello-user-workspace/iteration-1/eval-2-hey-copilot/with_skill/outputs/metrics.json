@@ -1,8 +1,0 @@
-{
-  "skill_used": "hello-user",
-  "prompt": "Hey Copilot, how's it going?",
-  "output_lines": 7,
-  "output_chars": 290,
-  "script_ran": true,
-  "verbatim": true
-}
