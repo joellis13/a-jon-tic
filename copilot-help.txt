@@ -48,8 +48,6 @@ Options:
   --banner                              Show the startup banner
   --bash-env[=value]                    Enable BASH_ENV support for bash shells
                                         (on|off)
-  --config-dir <directory>              Set the configuration directory
-                                        (default: ~/.copilot)
   --connect[=sessionId]                 Connect directly to a remote session
                                         (optionally specify session ID or task
                                         ID)
@@ -82,7 +80,7 @@ Options:
                                         "error", "warning", "info", "debug",
                                         "all", "default")
   --max-autopilot-continues <count>     Maximum number of continuation messages
-                                        in autopilot mode (default: unlimited)
+                                        in autopilot mode (default: 5)
   --mode <mode>                         Set the initial agent mode (choices:
                                         "interactive", "plan", "autopilot")
   --model <model>                       Set the AI model to use
@@ -140,6 +138,7 @@ Options:
                                         --allow-all-urls)
 
 Commands:
+  completion <shell>                    Generate a shell completion script
   help [topic]                          Display help information
   init                                  Initialize Copilot instructions
   login [options]                       Authenticate with Copilot
