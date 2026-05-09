@@ -1,0 +1,170 @@
+{
+  "skill_name": "hello-user",
+  "evaluations": [
+    {
+      "id": 1,
+      "prompt": "Hello!",
+      "general_expectation": "ASCII-art-style greeting produced by running scripts/hello_ascii.py for the current user",
+      "criteria": [
+        {
+          "id": 1,
+          "criterion": "Output is wrapped in a fenced code block in the agent's response"
+        },
+        {
+          "id": 2,
+          "criterion": "Output is multi-line and visually formatted like ASCII art or stylized terminal text"
+        },
+        {
+          "id": 3,
+          "criterion": "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py"
+        },
+        {
+          "id": 4,
+          "criterion": "Output does not contain conversational filler text such as 'How can I help you today'"
+        }
+      ],
+      "runs": [
+        {
+          "id": 1,
+          "response": "\u25cf Run hello-user ASCII greeting script (shell)\n  \u2502 python .github/skills/hello-user/scripts/hello_ascii.py\n  \u2514 7 lines...\n```\n _   _      _ _            _            _ _ _ \n| | | | ___| | | ___      (_) ___   ___| | | |\n| |_| |/ _ \\ | |/ _ \\     | |/ _ \\ / _ \\ | | |\n|  _  |  __/ | | (_) |    | | (_) |  __/ | |_|\n|_| |_|\\___|_|_|\\___( )  _/ |\\___/ \\___|_|_(_)\n                    |/  |__/\n```",
+          "tokens_input": "96.3k",
+          "tokens_output": "241",
+          "tokens_cached": "13.3k",
+          "duration_seconds": 18.0,
+          "assessment": null,
+          "files": []
+        },
+        {
+          "id": 2,
+          "response": "\u25cf Run hello_ascii.py to greet user in ASCII art (shell)\n  \u2502 python .github/skills/hello-user/scripts/hello_ascii.py\n  \u2514 7 lines...\n```\n _   _      _ _            _            _ _ _ \n| | | | ___| | | ___      (_) ___   ___| | | |\n| |_| |/ _ \\ | |/ _ \\     | |/ _ \\ / _ \\ | | |\n|  _  |  __/ | | (_) |    | | (_) |  __/ | |_|\n|_| |_|\\___|_|_|\\___( )  _/ |\\___/ \\___|_|_(_)\n                    |/  |__/\n```",
+          "tokens_input": "96.2k",
+          "tokens_output": "202",
+          "tokens_cached": "44.8k",
+          "duration_seconds": 18.0,
+          "assessment": null,
+          "files": []
+        },
+        {
+          "id": 3,
+          "response": "\u25cf Run hello-user ASCII greeting script (shell)\n  \u2502 python .github/skills/hello-user/scripts/hello_ascii.py\n  \u2514 7 lines...\n```\n _   _      _ _            _            _ _ _ \n| | | | ___| | | ___      (_) ___   ___| | | |\n| |_| |/ _ \\ | |/ _ \\     | |/ _ \\ / _ \\ | | |\n|  _  |  __/ | | (_) |    | | (_) |  __/ | |_|\n|_| |_|\\___|_|_|\\___( )  _/ |\\___/ \\___|_|_(_)\n                    |/  |__/\n```",
+          "tokens_input": "96.2k",
+          "tokens_output": "198",
+          "tokens_cached": "20.0k",
+          "duration_seconds": 18.0,
+          "assessment": null,
+          "files": []
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Hey Copilot, how's it going?",
+      "general_expectation": "ASCII-art-style greeting via hello_ascii.py \u00e2\u20ac\u201d skill should trigger even on casual non-'hello' greetings",
+      "criteria": [
+        {
+          "id": 1,
+          "criterion": "Output is wrapped in a fenced code block in the agent's response"
+        },
+        {
+          "id": 2,
+          "criterion": "Output is multi-line and visually formatted like ASCII art or stylized terminal text"
+        },
+        {
+          "id": 3,
+          "criterion": "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py"
+        },
+        {
+          "id": 4,
+          "criterion": "Output does not contain conversational filler text such as 'How can I help' or 'how are you'"
+        }
+      ],
+      "runs": [
+        {
+          "id": 1,
+          "response": "\u25cf Run hello_ascii.py to greet the user in ASCII art (shell)\n  \u2502 python .github/skills/hello-user/scripts/hello_ascii.py\n  \u2514 7 lines...\n```\n _   _      _ _            _            _ _ _ \n| | | | ___| | | ___      (_) ___   ___| | | |\n| |_| |/ _ \\ | |/ _ \\     | |/ _ \\ / _ \\ | | |\n|  _  |  __/ | | (_) |    | | (_) |  __/ | |_|\n|_| |_|\\___|_|_|\\___( )  _/ |\\___/ \\___|_|_(_)\n                    |/  |__/\n```",
+          "tokens_input": "96.2k",
+          "tokens_output": "203",
+          "tokens_cached": "45.4k",
+          "duration_seconds": 18.0,
+          "assessment": null,
+          "files": []
+        },
+        {
+          "id": 2,
+          "response": "\u25cf Run hello_ascii.py to greet the user in ASCII art (shell)\n  \u2502 python .github/skills/hello-user/scripts/hello_ascii.py\n  \u2514 7 lines...\n```\n _   _      _ _            _            _ _ _ \n| | | | ___| | | ___      (_) ___   ___| | | |\n| |_| |/ _ \\ | |/ _ \\     | |/ _ \\ / _ \\ | | |\n|  _  |  __/ | | (_) |    | | (_) |  __/ | |_|\n|_| |_|\\___|_|_|\\___( )  _/ |\\___/ \\___|_|_(_)\n                    |/  |__/\n```",
+          "tokens_input": "96.1k",
+          "tokens_output": "180",
+          "tokens_cached": "38.8k",
+          "duration_seconds": 18.0,
+          "assessment": null,
+          "files": []
+        },
+        {
+          "id": 3,
+          "response": "\u25cf Run hello_ascii.py to greet the user in ASCII art (shell)\n  \u2502 python .github/skills/hello-user/scripts/hello_ascii.py\n  \u2514 7 lines...\n```\n_   _      _ _            _            _ _ _ \n| | | | ___| | | ___      (_) ___   ___| | | |\n| |_| |/ _ \\ | |/ _ \\     | |/ _ \\ / _ \\ | | |\n|  _  |  __/ | | (_) |    | | (_) |  __/ | |_|\n|_| |_|\\___|_|_|\\___( )  _/ |\\___/ \\___|_|_(_)\n                    |/  |__/\n```",
+          "tokens_input": "96.2k",
+          "tokens_output": "180",
+          "tokens_cached": "45.4k",
+          "duration_seconds": 16.0,
+          "assessment": null,
+          "files": []
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Hello copilot",
+      "general_expectation": "ASCII-art-style greeting via hello_ascii.py \u00e2\u20ac\u201d style should be consistent with the script output used in evals 1 and 2",
+      "criteria": [
+        {
+          "id": 1,
+          "criterion": "Output is wrapped in a fenced code block in the agent's response"
+        },
+        {
+          "id": 2,
+          "criterion": "Output is multi-line and visually formatted like ASCII art or stylized terminal text"
+        },
+        {
+          "id": 3,
+          "criterion": "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py"
+        },
+        {
+          "id": 4,
+          "criterion": "Output does not contain conversational filler text"
+        }
+      ],
+      "runs": [
+        {
+          "id": 1,
+          "response": "\u25cf Run hello_ascii.py to greet the user with ASCII art (shell)\n  \u2502 python .github/skills/hello-user/scripts/hello_ascii.py\n  \u2514 7 lines...\n```\n _   _      _ _            _            _ _ _ \n| | | | ___| | | ___      (_) ___   ___| | | |\n| |_| |/ _ \\ | |/ _ \\     | |/ _ \\ / _ \\ | | |\n|  _  |  __/ | | (_) |    | | (_) |  __/ | |_|\n|_| |_|\\___|_|_|\\___( )  _/ |\\___/ \\___|_|_(_)\n                    |/  |__/\n```",
+          "tokens_input": "96.1k",
+          "tokens_output": "203",
+          "tokens_cached": "20.0k",
+          "duration_seconds": 18.0,
+          "assessment": null,
+          "files": []
+        },
+        {
+          "id": 2,
+          "response": "\u25cf Run hello-user ASCII greeting script (shell)\n  \u2502 python .github/skills/hello-user/scripts/hello_ascii.py\n  \u2514 7 lines...\n```\n _   _      _ _            _            _ _ _ \n| | | | ___| | | ___      (_) ___   ___| | | |\n| |_| |/ _ \\ | |/ _ \\     | |/ _ \\ / _ \\ | | |\n|  _  |  __/ | | (_) |    | | (_) |  __/ | |_|\n|_| |_|\\___|_|_|\\___( )  _/ |\\___/ \\___|_|_(_)\n                    |/  |__/\n```",
+          "tokens_input": "96.1k",
+          "tokens_output": "198",
+          "tokens_cached": "70.3k",
+          "duration_seconds": 16.0,
+          "assessment": null,
+          "files": []
+        },
+        {
+          "id": 3,
+          "response": "\u25cf Run hello-user ASCII greeting script (shell)\n  \u2502 python .github/skills/hello-user/scripts/hello_ascii.py\n  \u2514 7 lines...\n```\n _   _      _ _            _            _ _ _ \n| | | | ___| | | ___      (_) ___   ___| | | |\n| |_| |/ _ \\ | |/ _ \\     | |/ _ \\ / _ \\ | | |\n|  _  |  __/ | | (_) |    | | (_) |  __/ | |_|\n|_| |_|\\___|_|_|\\___( )  _/ |\\___/ \\___|_|_(_)\n                    |/  |__/\n```",
+          "tokens_input": "96.1k",
+          "tokens_output": "166",
+          "tokens_cached": "44.8k",
+          "duration_seconds": 16.0,
+          "assessment": null,
+          "files": []
+        }
+      ]
+    }
+  ]
+}

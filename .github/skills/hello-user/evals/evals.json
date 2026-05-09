@@ -1,40 +1,75 @@
 {
   "skill_name": "hello-user",
-  "evals": [
+  "evaluations": [
     {
       "id": 1,
       "prompt": "Hello!",
-      "expected_output": "ASCII-art-style greeting produced by running scripts/hello_ascii.py for the current user",
-      "files": [],
-      "expectations": [
-        "Output is wrapped in a fenced code block in the agent's response",
-        "Output is multi-line and visually formatted like ASCII art or stylized terminal text",
-        "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py",
-        "Output does not contain conversational filler text such as 'How can I help you today'"
+      "general_expectation": "ASCII-art-style greeting produced by running scripts/hello_ascii.py for the current user",
+      "criteria": [
+        {
+          "id": 1,
+          "criterion": "Output is wrapped in a fenced code block in the agent's response"
+        },
+        {
+          "id": 2,
+          "criterion": "Output is multi-line and visually formatted like ASCII art or stylized terminal text"
+        },
+        {
+          "id": 3,
+          "criterion": "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py"
+        },
+        {
+          "id": 4,
+          "criterion": "Output does not contain conversational filler text such as 'How can I help you today'"
+        }
       ]
     },
     {
       "id": 2,
       "prompt": "Hey Copilot, how's it going?",
-      "expected_output": "ASCII-art-style greeting via hello_ascii.py — skill should trigger even on casual non-'hello' greetings",
+      "general_expectation": "ASCII-art-style greeting via hello_ascii.py — skill should trigger even on casual non-'hello' greetings",
       "files": [],
-      "expectations": [
-        "Output is wrapped in a fenced code block in the agent's response",
-        "Output is multi-line and visually formatted like ASCII art or stylized terminal text",
-        "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py",
-        "Output does not contain conversational filler text such as 'How can I help' or 'how are you'"
+      "criteria": [
+        {
+          "id": 1,
+          "criterion": "Output is wrapped in a fenced code block in the agent's response"
+        },
+        {
+          "id": 2,
+          "criterion": "Output is multi-line and visually formatted like ASCII art or stylized terminal text"
+        },
+        {
+          "id": 3,
+          "criterion": "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py"
+        },
+        {
+          "id": 4,
+          "criterion": "Output does not contain conversational filler text such as 'How can I help' or 'how are you'"
+        }
       ]
     },
     {
       "id": 3,
       "prompt": "Hello copilot",
-      "expected_output": "ASCII-art-style greeting via hello_ascii.py — style should be consistent with the script output used in evals 1 and 2",
+      "general_expectation": "ASCII-art-style greeting via hello_ascii.py — style should be consistent with the script output used in evals 1 and 2",
       "files": [],
-      "expectations": [
-        "Output is wrapped in a fenced code block in the agent's response",
-        "Output is multi-line and visually formatted like ASCII art or stylized terminal text",
-        "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py",
-        "Output does not contain conversational filler text"
+      "criteria": [
+        {
+          "id": 1,
+          "criterion": "Output is wrapped in a fenced code block in the agent's response"
+        },
+        {
+          "id": 2,
+          "criterion": "Output is multi-line and visually formatted like ASCII art or stylized terminal text"
+        },
+        {
+          "id": 3,
+          "criterion": "Output conveys a greeting for the current user consistent with scripts/hello_ascii.py"
+        },
+        {
+          "id": 4,
+          "criterion": "Output does not contain conversational filler text"
+        }
       ]
     }
   ]

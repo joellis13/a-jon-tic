@@ -42,12 +42,18 @@ Options:
   --allow-tool[=tools...]               Tools the CLI has permission to use;
                                         will not prompt for permission
   --allow-url[=urls...]                 Allow access to specific URLs or domains
+  --attachment <path>                   Attach a file (image or native document)
+                                        to the initial prompt; only valid in
+                                        non-interactive mode (can be used
+                                        multiple times)
   --autopilot                           Start in autopilot mode
   --available-tools[=tools...]          Only these tools will be available to
                                         the model
   --banner                              Show the startup banner
   --bash-env[=value]                    Enable BASH_ENV support for bash shells
                                         (on|off)
+  -C <directory>                        Change working directory before doing
+                                        anything else
   --connect[=sessionId]                 Connect directly to a remote session
                                         (optionally specify session ID or task
                                         ID)
@@ -144,7 +150,7 @@ Commands:
   login [options]                       Authenticate with Copilot
   mcp                                   Manage MCP servers
   plugin                                Manage plugins
-  update                                Download the latest version
+  update [channel]                      Download the latest version
   version                               Display version information
 
 Help Topics:
