@@ -16,6 +16,7 @@ class Criterion:
 @dataclass
 class Run:
     id: int
+    include_skill: bool
     response: str
     tokens_input: Optional[str]
     tokens_output: Optional[str]
@@ -31,6 +32,18 @@ class Evaluation:
     general_expectation: str
     criteria: list[Criterion]
     runs: list[Run] = field(default_factory=list)
+
+@dataclass 
+class ExtEvaluation(Evaluation):
+    include_skill: bool = False
+
+    def __init__(self, evaluation: Evaluation, include_skill: bool):
+        self.id = evaluation.id
+        self.prompt = evaluation.prompt
+        self.general_expectation = evaluation.general_expectation
+        self.criteria = evaluation.criteria
+        self.runs = evaluation.runs
+        self.include_skill = include_skill
 
     
 @dataclass

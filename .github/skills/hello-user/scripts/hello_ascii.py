@@ -54,8 +54,10 @@ def render(text: str) -> str:
 def main() -> None:
     username = get_username(sys.argv[1] if len(sys.argv) > 1 else None)
     greeting = f"Hello, {username}!"
-    print(render(greeting))
-
+    ascii_greeting = render(greeting)
+    print(ascii_greeting)
+    with open(f"hello-{username}.txt") as f:
+        f.write(ascii_greeting)
 
 if __name__ == "__main__":
     main()

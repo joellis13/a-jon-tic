@@ -3,11 +3,15 @@ from concurrent.futures import ThreadPoolExecutor
 import copy
 from pprint import pprint
 from pathlib import Path
+import shutil
 import subprocess
+import tempfile
 
-from evaluation_models import SkillEvaluation, Evaluation, Run
+from evaluation_models import ExtEvaluation, SkillEvaluation, Evaluation, Run
 from copilot_models import CopilotResponse
 
+SKILL_NAME = ""
+SKILL_EVAL_RESULTS_DIR = ""
 CURRENT_WORKING_DIR = Path(__file__).resolve()
 SKILLEVATOR_ROOT = CURRENT_WORKING_DIR.parents[1]
 PROJECT_ROOT = CURRENT_WORKING_DIR.parents[4]
@@ -20,20 +24,36 @@ EVALUATIONS = "evaluations"
 EVALS_JSON = "evals.json"
 SKILLEVATOR_EVALUATIONS = SKILLEVATOR_ROOT / EVALUATIONS
 
-def setup_eval_location(skill_name: str) -> Path:
-    skill_evaluation_directory = SKILLEVATOR_EVALUATIONS / skill_name
+def set_skill_name(skill_name: str):
+    global SKILL_NAME
+    SKILL_NAME = skill_name
+
+def get_results_dir() -> Path:
+    skill_eval_dir = SKILLEVATOR_EVALUATIONS / SKILL_NAME
+    base_name = skill_eval_dir / "iteration"
+    counter = 1
+    while True:
+        directory_name = Path(f"{base_name}-{counter:02d}")
+        if not directory_name.exists():
+            directory_name.mkdir(parents=True)
+            print(f"Created: {directory_name}")
+            return directory_name
+        counter += 1
+
+def setup_eval_location() -> Path:
+    skill_evaluation_directory = SKILLEVATOR_EVALUATIONS / SKILL_NAME
     skill_evaluation_directory.mkdir(parents=True, exist_ok=True)
     return skill_evaluation_directory / EVALS_JSON
 
-def get_evals(skill_name: str) -> SkillEvaluation :
-    skill_dir = SKILLS_DIR / skill_name
+def get_evals() -> SkillEvaluation :
+    skill_dir = SKILLS_DIR / SKILL_NAME
     skill_eval_file = skill_dir / EVALS / EVALS_JSON 
 
     skill_eval = SkillEvaluation.from_json_file(skill_eval_file)
 
     return skill_eval
 
-def run_prompt(args: tuple[Evaluation, int, int]) -> tuple[Evaluation, Run]:
+def run_prompt(args: tuple[ExtEvaluation, int, int]) -> tuple[Evaluation, Run]:
     """Run a single prompt and return the evaluation + run result."""
     evaluation, run_index, total_runs = args
     eval_id = evaluation.id
@@ -57,13 +77,17 @@ def run_prompt(args: tuple[Evaluation, int, int]) -> tuple[Evaluation, Run]:
     print("skill_name: " + str(response.skill_name))
     print("success: " + str(response.success))
     print("error: " + str(response.error))
+    print("include_skill: " + str(evaluation.include_skill))
     print("message: " + str(response.message))
     print("tokens_input: " + str(response.tokens_input))
+    print("tokens_output: " + str(response.tokens_output))
+    print("tokens_cached: " + str(response.tokens_cached))
     print("duration_seconds: " + str(response.duration_seconds))
     print("==================================================\n")
     
     run = Run(
         id=run_index + 1,
+        include_skill=evaluation.include_skill,
         response=response.message,
         tokens_input=response.tokens_input,
         tokens_output=response.tokens_output,
@@ -75,17 +99,36 @@ def run_prompt(args: tuple[Evaluation, int, int]) -> tuple[Evaluation, Run]:
     
     return evaluation, run
 
+def run_prompt_in_temp_dir(args: tuple[ExtEvaluation, int, int]) -> tuple[Evaluation, Run]:
+    with tempfile.TemporaryDirectory() as tmp:
+        evaluation, run_index, total_runs = args
+        tmp_path = Path(tmp)
+        shutil.copytree(GITHUB_DIR, tmp_path / GITHUB)
+
+        return run_prompt(args)
+
+def get_split_evaluations(evaluations: list[Evaluation]) -> list[ExtEvaluation]:
+    split_evaluations = []
+    for evaluation in evaluations:
+        include_skill_eval = ExtEvaluation(evaluation, True)
+        exclude_skill_eval = ExtEvaluation(evaluation, False)
+        split_evaluations.append(include_skill_eval)
+        split_evaluations.append(exclude_skill_eval)
+
+    return split_evaluations
+
 def run_prompts(evaluations: list[Evaluation], times: int = 3) -> list[Evaluation]:
     """Run each evaluation multiple times concurrently."""
+    split_evaluations = get_split_evaluations(evaluations)
     # Create tasks: (evaluation, run_index, total_runs) for each evaluation × times
     tasks = [
         (evaluation, run_num, times)
-        for evaluation in evaluations
+        for evaluation in split_evaluations
         for run_num in range(times)
     ]
     
     with ThreadPoolExecutor() as executor:
-        results = list(executor.map(run_prompt, tasks))
+        results = list(executor.map(run_prompt_in_temp_dir, tasks))
     
     # Collect runs by evaluation ID
     evaluation_runs = {eval.id: [] for eval in evaluations}
@@ -99,8 +142,10 @@ def run_prompts(evaluations: list[Evaluation], times: int = 3) -> list[Evaluatio
     return evaluations
 
 def main():
-    eval_location = setup_eval_location("hello-user")
-    skill_eval = get_evals("hello-user")
+    skill_name = "hello-user"
+    set_skill_name(skill_name)
+    eval_location = setup_eval_location()
+    skill_eval = get_evals()
     evaluations = skill_eval.evaluations
     evaluations_with_runs = run_prompts(evaluations, times=3)
     pprint([{"id": e.id, "runs_count": len(e.runs)} for e in evaluations_with_runs])
