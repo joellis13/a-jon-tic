@@ -23,7 +23,6 @@ class Run:
     tokens_cached: Optional[str]
     duration_seconds: Optional[float]
     assessment: Optional[Assessment]
-    include_skills: bool
     files: list[Path] = field(default_factory=list)
 
 @dataclass
@@ -64,11 +63,7 @@ class SkillEvaluation:
                     criteria=[Criterion(**c) for c in e.get("criteria", [])],
                     runs=[
                         Run(
-                            **{
-                                **r,
-                                "assessment": Assessment(**r["assessment"]) if r.get("assessment") else None,
-                                "include_skills": r.get("include_skills", True),
-                            }
+                            **{**r, "assessment": Assessment(**r["assessment"])}
                         )
                         for r in e.get("runs", [])
                     ],
