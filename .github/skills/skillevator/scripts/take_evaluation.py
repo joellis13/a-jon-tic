@@ -55,19 +55,25 @@ def get_evals() -> SkillEvaluation :
 
 def run_prompt(args: tuple[ExtEvaluation, int, int]) -> tuple[Evaluation, Run]:
     """Run a single prompt and return the evaluation + run result."""
-    evaluation, run_index, total_runs = args
+    evaluation, run_index, total_runs, cwd, include_skills, run_id_offset = args
     eval_id = evaluation.id
     prompt = evaluation.prompt
-    command = "copilot --allow-tool=\"shell(python)\" --model gpt-4.1 -p \"" + prompt + "\""
+    command = [
+        "copilot",
+        "--allow-tool=shell(python)",
+        "--model",
+        "gpt-4.1",
+        "-p",
+        prompt,
+    ]
     print(f"[Run {run_index + 1}/{total_runs}] command {eval_id}: {command}")
 
     result = subprocess.run(
         command,
-        shell=True,
         capture_output=True,
         text=True,
         encoding='utf-8',
-        cwd=str(PROJECT_ROOT)
+        cwd=str(cwd)
     )
 
     response = CopilotResponse.from_subprocess_result(result)
@@ -83,6 +89,7 @@ def run_prompt(args: tuple[ExtEvaluation, int, int]) -> tuple[Evaluation, Run]:
     print("tokens_output: " + str(response.tokens_output))
     print("tokens_cached: " + str(response.tokens_cached))
     print("duration_seconds: " + str(response.duration_seconds))
+    print("include_skills: " + str(include_skills))
     print("==================================================\n")
     
     run = Run(
@@ -94,6 +101,7 @@ def run_prompt(args: tuple[ExtEvaluation, int, int]) -> tuple[Evaluation, Run]:
         tokens_cached=response.tokens_cached,
         duration_seconds=response.duration_seconds,
         assessment=None,
+        include_skills=include_skills,
         files=[]
     )
     
@@ -141,17 +149,86 @@ def run_prompts(evaluations: list[Evaluation], times: int = 3) -> list[Evaluatio
     
     return evaluations
 
+def ignore_skill(skill: str):
+    """Returns an ignore function for a specific skill directory."""
+    def _ignore(directory, files):
+        result = []
+        # Check if we're currently in the skills directory
+        if directory.endswith("skills"):
+            # Ignore just the specific skill subdirectory
+            if skill in files:
+                result.append(skill)
+        return result
+    return _ignore
+
+def run_prompts_in_temp_dir(
+    evaluations: list[Evaluation],
+    skill_name: str,
+    include_skills: bool,
+    times: int = 3,
+    run_id_offset: int = 0,
+) -> list[Evaluation]:
+    
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        
+        # Copy the .github dir (or just the parts Copilot needs)
+        if include_skills:
+            shutil.copytree(GITHUB_DIR, tmp_path / GITHUB)
+        else:
+            # Copy .github but omit skills/
+            shutil.copytree(GITHUB_DIR, tmp_path / GITHUB,
+                ignore=ignore_skill(skill_name)
+            )
+
+        return run_prompts(
+            evaluations,
+            cwd=tmp_path,
+            include_skills=include_skills,
+            times=times,
+            run_id_offset=run_id_offset,
+        )
+
+
+def run_with_and_without_skills(
+    evaluations: list[Evaluation],
+    skill_name: str,
+    times: int = 3,
+) -> list[Evaluation]:
+    evaluations = run_prompts_in_temp_dir(
+        evaluations,
+        skill_name=skill_name,
+        include_skills=True,
+        times=times,
+        run_id_offset=0,
+    )
+    evaluations = run_prompts_in_temp_dir(
+        evaluations,
+        skill_name=skill_name,
+        include_skills=False,
+        times=times,
+        run_id_offset=times,
+    )
+    return evaluations
+
+
 def main():
     skill_name = "hello-user"
     set_skill_name(skill_name)
     eval_location = setup_eval_location()
     skill_eval = get_evals()
     evaluations = skill_eval.evaluations
-    evaluations_with_runs = run_prompts(evaluations, times=3)
+    evaluations_with_runs = run_with_and_without_skills(
+        evaluations,
+        skill_name=skill_name,
+        times=3,
+    )
     pprint([{"id": e.id, "runs_count": len(e.runs)} for e in evaluations_with_runs])
     updated_skill_eval = copy.deepcopy(skill_eval)
     updated_skill_eval.evaluations = evaluations_with_runs
 
-    SkillEvaluation.to_json_file(updated_skill_eval, eval_location)
+    updated_skill_eval.to_json_file(eval_location)
 
-main()
+
+if __name__ == "__main__":
+    main()
