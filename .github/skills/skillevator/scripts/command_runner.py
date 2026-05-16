@@ -1,5 +1,5 @@
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 from evaluation_config import EvaluationConfig
 from copilot_models import CopilotResponse
@@ -23,12 +23,19 @@ class CopilotCommandRunner:
         )
 
     def run(self, prompt: str, cwd: Path) -> CopilotResponse:
-        result = subprocess.run(
-            self.build_command(prompt),
-            shell=True,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            cwd=str(cwd),
-        )
-        return CopilotResponse.from_subprocess_result(result)
+        try:
+            result = subprocess.run(
+                self.build_command(prompt),
+                shell=True,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                cwd=str(cwd),
+                timeout=self._config.timeout,
+            )
+            return CopilotResponse.from_subprocess_result(result)
+        except subprocess.TimeoutExpired:
+            return CopilotResponse(
+                success=False,
+                error=f"timeout after {self._config.timeout}s",
+            )

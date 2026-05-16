@@ -16,6 +16,7 @@ class EvaluationConfig:
     model: str = "gpt-4.1"
     allowed_tools: str = "shell(python)"
     times: int = 3
+    timeout: int = 120
 
     project_root: Path                = field(init=False, repr=False)
     skillevator_root: Path            = field(init=False, repr=False)
