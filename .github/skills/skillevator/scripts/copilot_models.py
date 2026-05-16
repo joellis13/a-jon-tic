@@ -3,6 +3,14 @@ from typing import Optional
 import re
 
 
+def _parse_token_count(value: str) -> int:
+    """Convert token strings like '71.3k' → 71300 or '109' → 109."""
+    value = value.strip()
+    if value.lower().endswith('k'):
+        return round(float(value[:-1]) * 1000)
+    return int(value)
+
+
 @dataclass
 class CopilotResponse:
     """Parsed response from a Copilot CLI command."""
@@ -13,9 +21,9 @@ class CopilotResponse:
     stdout_raw: str = ""
     stderr_raw: str = ""
     returncode: int = 0
-    tokens_input: Optional[str] = None
-    tokens_output: Optional[str] = None
-    tokens_cached: Optional[str] = None
+    tokens_input: Optional[int] = None
+    tokens_output: Optional[int] = None
+    tokens_cached: Optional[int] = None
     duration_seconds: Optional[float] = None
 
     @classmethod
@@ -49,9 +57,9 @@ class CopilotResponse:
         # Parse tokens from stderr (Tokens    ↑ 96.2k • ↓ 109 • 13.3k (cached))
         tokens_match = re.search(r'Tokens\s+↑\s+([\d.]+k?)\s*•\s*↓\s+([\d.]+)\s*•\s+([\d.]+k?)', result.stderr)
         if tokens_match:
-            obj.tokens_input = tokens_match.group(1)
-            obj.tokens_output = tokens_match.group(2)
-            obj.tokens_cached = tokens_match.group(3)
+            obj.tokens_input  = _parse_token_count(tokens_match.group(1))
+            obj.tokens_output = _parse_token_count(tokens_match.group(2))
+            obj.tokens_cached = _parse_token_count(tokens_match.group(3))
 
         # Parse duration from stderr (Requests  0 Premium (15s))
         duration_match = re.search(r'\((\d+(?:\.\d+)?)s\)', result.stderr)

@@ -23,9 +23,9 @@ class Run:
     id: int
     include_skill: bool
     response: str
-    tokens_input: Optional[str]
-    tokens_output: Optional[str]
-    tokens_cached: Optional[str]
+    tokens_input: Optional[int]
+    tokens_output: Optional[int]
+    tokens_cached: Optional[int]
     duration_seconds: Optional[float]
     assessment: Optional[Assessment]
     skill_name: Optional[str] = None
