@@ -53,73 +53,17 @@ scripts/
 
 ---
 
-### Phase 3 — Split `run_prompt` (SRP)
+### ✅ Phase 3 — Split `run_prompt` (SRP) — DONE
 
-`run_prompt` (lines 57–125) does five distinct things. Each becomes its own unit.
+**Delivered:**
 
-#### 3a — `CopilotResponse.format_summary()`
+- `scripts/copilot_models.py` — `CopilotResponse.format_summary(eval_id, run_index, total_runs, include_skill) -> str`; replaces inline print block
+- `scripts/run_factory.py` — new `RunFactory.create(response, evaluation, run_index) -> Run`; pure data transformation, no I/O
+- `scripts/run_directory_writer.py` — new `RunDirectoryWriter.write(run_dir, response, evaluation)`; pure I/O; named constants `RESPONSE_FILE`, `STDOUT_FILE`, `STDERR_FILE`, `META_FILE`, `WITH_SKILL`, `WITHOUT_SKILL`
+- `scripts/evaluation_runner.py` — new `EvaluationRunner(config, runner, factory, writer)`; `run_task(task) -> tuple[Evaluation, Run]`; replaces `run_prompt` + `run_prompt_in_temp_dir`; all collaborators injected (DIP complete)
+- `scripts/take_evaluation.py` — removed `run_prompt`, `run_prompt_in_temp_dir`; removed `json`, `shutil`, `tempfile`, `CopilotResponse`, `Run` imports; `run_prompts` now accepts `EvaluationRunner`; `main()` wires all dependencies; `get_split_evaluations` simplified
 
-**File:** `scripts/copilot_models.py`
-
-The print block (lines 78–89) belongs on `CopilotResponse`, not in the runner.
-
-```python
-def format_summary(self, eval_id: int, run_index: int, total_runs: int, include_skill: bool) -> str:
-    ...
-```
-
-#### 3b — `RunFactory`
-
-**File:** `scripts/run_factory.py`
-
-Building a `Run` dataclass (lines 95–108) from a `CopilotResponse` + `ExtEvaluation` is pure data transformation — no I/O.
-
-```python
-class RunFactory:
-    @staticmethod
-    def create(response: CopilotResponse, evaluation: ExtEvaluation, run_index: int) -> Run:
-        ...
-```
-
-#### 3c — `RunDirectoryWriter`
-
-**File:** `scripts/run_directory_writer.py`
-
-Writing `response.md`, `stdout.txt`, `stderr.txt`, `meta.json` (lines 110–123) is I/O only.
-
-```python
-class RunDirectoryWriter:
-    def write(self, run_dir: Path, response: CopilotResponse, evaluation: ExtEvaluation) -> None:
-        ...
-```
-
-Named constants for all magic strings live here:
-
-```python
-RESPONSE_FILE = "response.md"
-STDOUT_FILE   = "stdout.txt"
-STDERR_FILE   = "stderr.txt"
-META_FILE     = "meta.json"
-WITH_SKILL    = "with_skill"
-WITHOUT_SKILL = "without_skill"
-```
-
-#### 3d — `EvaluationRunner`
-
-**File:** `scripts/evaluation_runner.py`
-
-Thin orchestrator that wires together `CopilotCommandRunner`, `RunFactory`, and `RunDirectoryWriter`.
-Replaces `run_prompt` and `run_prompt_in_temp_dir`.
-
-```python
-class EvaluationRunner:
-    def __init__(self, config: EvaluationConfig, runner: CopilotCommandRunner,
-                 factory: RunFactory, writer: RunDirectoryWriter): ...
-
-    def run_task(self, task: RunTask) -> tuple[Evaluation, Run]: ...
-```
-
-**SOLID:** SRP (each class has one job), DIP (orchestrator depends on injected collaborators)
+**SOLID applied:** SRP (each class has one job), DIP (EvaluationRunner receives all collaborators)
 
 ---
 
@@ -159,9 +103,9 @@ Phase 4 (cleanups)  ← independent, can be done anytime
 | --------------------------------- | ------------------------------------------------------------ |
 | `scripts/evaluation_config.py`    | ✅ Done                                                      |
 | `scripts/evaluation_models.py`    | ✅ Done (`RunTask.config` + `TYPE_CHECKING` import)          |
-| `scripts/take_evaluation.py`      | 🔄 In progress (globals removed; more changes in phases 3–4) |
+| `scripts/take_evaluation.py`      | 🔄 In progress (phases 1–3 done; Phase 4 remains)           |
 | `scripts/command_runner.py`       | ✅ Done                                                      |
-| `scripts/run_factory.py`          | **New** — Phase 3b                                           |
-| `scripts/run_directory_writer.py` | **New** — Phase 3c                                           |
-| `scripts/evaluation_runner.py`    | **New** — Phase 3d                                           |
-| `scripts/copilot_models.py`       | Modified — Phase 3a (add `format_summary`)                   |
+| `scripts/copilot_models.py`       | ✅ Done (`format_summary` added)                             |
+| `scripts/run_factory.py`          | ✅ Done                                                      |
+| `scripts/run_directory_writer.py` | ✅ Done                                                      |
+| `scripts/evaluation_runner.py`    | ✅ Done                                                      |
