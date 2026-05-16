@@ -17,7 +17,7 @@ python take_evaluation.py --skill-name hello-user --model gpt-4.1 --times 3
 
 ## Execution Order
 
-```
+```text
 take_evaluation.py          ← CLI entry point
 │
 ├── parse_args()            ← resolve --skill-name / --model / --times

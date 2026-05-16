@@ -10,7 +10,7 @@ This plan applies SOLID principles to produce a modular, testable, extensible de
 
 ## Target Architecture
 
-```
+```text
 scripts/
   take_evaluation.py        ← thin CLI entrypoint only
   evaluation_config.py      ← NEW: EvaluationConfig dataclass (replaces globals)
@@ -71,13 +71,13 @@ scripts/
 
 **Delivered:**
 
-| #   | Issue                                                              | Fix                                                                       |
-| --- | ------------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| 4a  | `main()` called at module level                                    | ✅ Wrapped in `if __name__ == "__main__":`                                |
-| 4b  | `skill_name` hardcoded as `"hello-user"` in `main()`              | ✅ `parse_args()` with `--skill-name`, `--model`, `--times` via argparse  |
-| 4c  | ~~Unbound method call~~                                            | ✅ Fixed in Phase 1                                                       |
-| 4d  | `get_split_evaluations` used a manual loop                         | ✅ Simplified to one-line list comprehension                              |
-| 4e  | `parents[1]` / `parents[4]` magic indices in `evaluation_config`  | ✅ Replaced with `.parent.parent` chains with inline comments             |
+| #   | Issue                                                            | Fix                                                                      |
+| --- | ---------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| 4a  | `main()` called at module level                                  | ✅ Wrapped in `if __name__ == "__main__":`                               |
+| 4b  | `skill_name` hardcoded as `"hello-user"` in `main()`             | ✅ `parse_args()` with `--skill-name`, `--model`, `--times` via argparse |
+| 4c  | ~~Unbound method call~~                                          | ✅ Fixed in Phase 1                                                      |
+| 4d  | `get_split_evaluations` used a manual loop                       | ✅ Simplified to one-line list comprehension                             |
+| 4e  | `parents[1]` / `parents[4]` magic indices in `evaluation_config` | ✅ Replaced with `.parent.parent` chains with inline comments            |
 
 ---
 
@@ -85,7 +85,7 @@ scripts/
 
 Dependencies flow top-to-bottom. Each phase can be reviewed independently.
 
-```
+```text
 Phase 1 (EvaluationConfig)
     └── Phase 2 (CopilotCommandRunner)  ← depends on config
             └── Phase 3a (format_summary)
@@ -99,13 +99,13 @@ Phase 4 (cleanups)  ← independent, can be done anytime
 
 ## Files Changed / Created
 
-| File                              | Status                                                       |
-| --------------------------------- | ------------------------------------------------------------ |
-| `scripts/evaluation_config.py`    | ✅ Done                                                      |
-| `scripts/evaluation_models.py`    | ✅ Done (`RunTask.config` + `TYPE_CHECKING` import)          |
-| `scripts/take_evaluation.py`      | ✅ Done (thin CLI entrypoint; all phases complete)          |
-| `scripts/command_runner.py`       | ✅ Done                                                      |
-| `scripts/copilot_models.py`       | ✅ Done (`format_summary` added)                             |
-| `scripts/run_factory.py`          | ✅ Done                                                      |
-| `scripts/run_directory_writer.py` | ✅ Done                                                      |
-| `scripts/evaluation_runner.py`    | ✅ Done                                                      |
+| File                              | Status                                              |
+| --------------------------------- | --------------------------------------------------- |
+| `scripts/evaluation_config.py`    | ✅ Done                                             |
+| `scripts/evaluation_models.py`    | ✅ Done (`RunTask.config` + `TYPE_CHECKING` import) |
+| `scripts/take_evaluation.py`      | ✅ Done (thin CLI entrypoint; all phases complete)  |
+| `scripts/command_runner.py`       | ✅ Done                                             |
+| `scripts/copilot_models.py`       | ✅ Done (`format_summary` added)                    |
+| `scripts/run_factory.py`          | ✅ Done                                             |
+| `scripts/run_directory_writer.py` | ✅ Done                                             |
+| `scripts/evaluation_runner.py`    | ✅ Done                                             |
