@@ -76,12 +76,13 @@ def run_prompts(evaluations: list[Evaluation], iteration_dir: Path, baseline_dir
     with ThreadPoolExecutor() as executor:
         results = list(executor.map(eval_runner.run_task, tasks))
 
-    evaluation_runs = {eval.id: [] for eval in evaluations}
+    evaluation_map = {e.id: e for e in evaluations}
     for evaluation, run in results:
-        evaluation_runs[evaluation.id].append(run)
-
-    for evaluation in evaluations:
-        evaluation.runs.extend(evaluation_runs[evaluation.id])
+        target = evaluation_map[evaluation.id]
+        if run.include_skill:
+            target.with_skill_runs.append(run)
+        else:
+            target.baseline_runs.append(run)
 
     return evaluations
 
@@ -105,7 +106,7 @@ def main():
     skill_eval = get_evals(config)
     evaluations = skill_eval.evaluations
     evaluations_with_runs = run_prompts(evaluations, iteration_dir, baseline_dir, eval_runner)
-    pprint([{"id": e.id, "runs_count": len(e.runs)} for e in evaluations_with_runs])
+    pprint([{"id": e.id, "name": e.evaluation_name, "with_skill": len(e.with_skill_runs), "baseline": len(e.baseline_runs)} for e in evaluations_with_runs])
     updated_skill_eval = copy.deepcopy(skill_eval)
     updated_skill_eval.evaluations = evaluations_with_runs
     updated_skill_eval.to_json_file(eval_location)
