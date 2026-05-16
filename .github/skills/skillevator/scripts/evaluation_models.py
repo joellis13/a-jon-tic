@@ -63,7 +63,7 @@ class SkillEvaluation:
                     criteria=[Criterion(**c) for c in e.get("criteria", [])],
                     runs=[
                         Run(
-                            **{**r, "assessment": Assessment(**r["assessment"])}
+                            **{**r, "assessment": Assessment(**r["assessment"]) if r.get("assessment") else None}
                         )
                         for r in e.get("runs", [])
                     ],

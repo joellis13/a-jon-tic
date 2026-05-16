@@ -53,7 +53,7 @@ def get_evals() -> SkillEvaluation :
 
     return skill_eval
 
-def run_prompt(args: tuple[ExtEvaluation, int, int]) -> tuple[Evaluation, Run]:
+def run_prompt(args: tuple[ExtEvaluation, int, int], cwd: Path = PROJECT_ROOT) -> tuple[Evaluation, Run]:
     """Run a single prompt and return the evaluation + run result."""
     evaluation, run_index, total_runs = args
     eval_id = evaluation.id
@@ -67,7 +67,7 @@ def run_prompt(args: tuple[ExtEvaluation, int, int]) -> tuple[Evaluation, Run]:
         capture_output=True,
         text=True,
         encoding='utf-8',
-        cwd=str(PROJECT_ROOT)
+        cwd=str(cwd)
     )
 
     response = CopilotResponse.from_subprocess_result(result)
@@ -105,7 +105,7 @@ def run_prompt_in_temp_dir(args: tuple[ExtEvaluation, int, int]) -> tuple[Evalua
         tmp_path = Path(tmp)
         shutil.copytree(GITHUB_DIR, tmp_path / GITHUB)
 
-        return run_prompt(args)
+        return run_prompt(args, cwd=tmp_path)
 
 def get_split_evaluations(evaluations: list[Evaluation]) -> list[ExtEvaluation]:
     split_evaluations = []
