@@ -26,6 +26,7 @@ class RunDirectoryWriter:
             "model":            model,
             "prompt":           evaluation.prompt,
             "skill_name":       response.skill_name,
+            "skill_triggered":  response.skill_name is not None,
             "success":          response.success,
             "error":            response.error,
             "returncode":       response.returncode,

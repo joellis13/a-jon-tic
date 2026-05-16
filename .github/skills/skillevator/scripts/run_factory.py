@@ -20,6 +20,7 @@ class RunFactory:
             duration_seconds=response.duration_seconds,
             assessment=None,
             skill_name=response.skill_name,
+            skill_triggered=response.skill_name is not None,
             success=response.success,
             error=response.error,
         )

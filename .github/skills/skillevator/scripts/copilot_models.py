@@ -39,13 +39,7 @@ class CopilotResponse:
         match = re.search(r'●\s*skill\(([^)]+)\)', result.stdout)
         obj.skill_name = match.group(1) if match else None
 
-        # Check for success/failure
-        obj.success = result.returncode == 0 and "✗" not in result.stdout
-
-        # Extract error if present
-        if "✗" in result.stdout:
-            error_line = result.stdout.split("✗")[1].split("\n")[0].strip()
-            obj.error = error_line
+        obj.success = result.returncode == 0
 
         # Get the main message (everything after skill name header)
         lines = result.stdout.split("\n")
@@ -74,6 +68,7 @@ class CopilotResponse:
             f"prompt: {prompt}",
             f"include_skill: {include_skill}",
             f"skill_name: {self.skill_name}",
+            f"skill_triggered: {self.skill_name is not None}",
             f"success: {self.success}",
             f"error: {self.error}",
             f"tokens_input: {self.tokens_input}",

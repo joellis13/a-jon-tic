@@ -29,6 +29,7 @@ class Run:
     duration_seconds: Optional[float]
     assessment: Optional[Assessment]
     skill_name: Optional[str] = None
+    skill_triggered: Optional[bool] = None
     success: Optional[bool] = None
     error: Optional[str] = None
 
