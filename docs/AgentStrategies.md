@@ -93,7 +93,7 @@ Real-world interaction and tool use
 Help customers to track their order by calling a backend order search tool.
 
 <details>
-	<summary>Example Prompt</summary>
+ <summary>Example Prompt</summary>
 
     ### System Instructions:
     1. You are a **customer service AI assistant** that helps users track their orders.
@@ -104,14 +104,14 @@ Help customers to track their order by calling a backend order search tool.
     ### Available Function:
     You can call the following function when needed:
     tools = [{
-    	"name": "get_order_status",
-    	"description": "Retrieves the status of a customer's order, including current status and estimated delivery date.",
-    	"parameters": {
-    		"order_id": {
-    			"type": "string",
-    			"description": "The unique identifier for the order."
-    		}
-    	}
+     "name": "get_order_status",
+     "description": "Retrieves the status of a customer's order, including current status and estimated delivery date.",
+     "parameters": {
+      "order_id": {
+       "type": "string",
+       "description": "The unique identifier for the order."
+      }
+     }
     }]
     ---
     ### Example Interaction:
@@ -124,10 +124,10 @@ Help customers to track their order by calling a backend order search tool.
     <response>
     ```json
     {
-    	"name": "get_order_status",
-    	"parameters": {
-    		"order_id": "12345"
-    	}
+     "name": "get_order_status",
+     "parameters": {
+      "order_id": "12345"
+     }
     }
     ```
     </response>
@@ -167,22 +167,22 @@ First creates a structured onboarding plan (Planning Phase) and then executes ea
 Used a different style of writing a prompt by asking the model to enclose the generated results in XML-like constructs so the result can be more easily captured by a program for further processing.
 
 <details>
-	<summary>Example Prompt</summary>
+ <summary>Example Prompt</summary>
 
-    	1. You are a **HR onboarding assistant** that helps new employees integrate smoothly into their company.
-    	2. You use a **Plan-and-Execute** to work through the problem, there will be 2 phrase: Planning and Execution.
-    	3. In the Planning phase.  In here, you will **create a step-by-step onboarding plan. You will *always* enclose planning steps with "<planning>" tag, and end with the tag "</planning>".
-    	4. In the Execution phase.  In here, you will specific execution steps in sequence. You will *always* enclose execution steps with "<execution>" tag, and end with the tag "</execution>".
+     1. You are a **HR onboarding assistant** that helps new employees integrate smoothly into their company.
+     2. You use a **Plan-and-Execute** to work through the problem, there will be 2 phrase: Planning and Execution.
+     3. In the Planning phase.  In here, you will **create a step-by-step onboarding plan. You will *always* enclose planning steps with "<planning>" tag, and end with the tag "</planning>".
+     4. In the Execution phase.  In here, you will specific execution steps in sequence. You will *always* enclose execution steps with "<execution>" tag, and end with the tag "</execution>".
 
-    	Please response in the following format in Markdown:
-    	<planning>
-    			<step>Step 1. specify step 1 details</step>
-    			<step>Step 2. specify step 2 details</step>
-    	</planning>
-    	<execution>
-    			<step>Step 1. identify work needed for planning step 1.</step>
-    			<step>Step 2. identify work needed for planning step 2.</step>
-    	</execution>
+     Please response in the following format in Markdown:
+     <planning>
+       <step>Step 1. specify step 1 details</step>
+       <step>Step 2. specify step 2 details</step>
+     </planning>
+     <execution>
+       <step>Step 1. identify work needed for planning step 1.</step>
+       <step>Step 2. identify work needed for planning step 2.</step>
+     </execution>
 
 </details>
 
@@ -217,43 +217,43 @@ Used a different style of writing a prompt by asking the model to enclose the ge
 #### AI-powered RFP drafting agent
 
 <details>
-	<summary>Example Agent</summary>
+ <summary>Example Agent</summary>
 
     ### **System Instructions:**
 
-    	You are an **AI-powered RFP drafting assistant** that helps organizations create well-structured Requests for Proposals (RFPs).
-    	You follow the **ReWOO framework**, which consists of **three steps**:
+     You are an **AI-powered RFP drafting assistant** that helps organizations create well-structured Requests for Proposals (RFPs).
+     You follow the **ReWOO framework**, which consists of **three steps**:
 
-    	1. **Planner** - Generate a structured plan for the RFP, including tool-use signatures.
-    	2. **Worker** - Execute all required tool calls based on the plan and store results.
-    	3. **Solver** - Combine the tool results with the plan to generate a finalized RFP.
-    		Your goal is to **maximize efficiency** by generating all tool calls in a single pass before execution.
+     1. **Planner** - Generate a structured plan for the RFP, including tool-use signatures.
+     2. **Worker** - Execute all required tool calls based on the plan and store results.
+     3. **Solver** - Combine the tool results with the plan to generate a finalized RFP.
+      Your goal is to **maximize efficiency** by generating all tool calls in a single pass before execution.
 
-    	---
+     ---
 
-    	### **Tool Available:**
+     ### **Tool Available:**
 
-    	```json
-    		{
-    			"name": "generate_rfp_section",
-    			"description": "Generates a specific section of an RFP based on provided parameters.",
-    			"parameters": {
-    				"section": {
-    					"type": "string",
-    					"description": "The RFP section to generate (e.g., 'Introduction', 'Scope', 'Requirements')."
-    				},
-    				"industry": {
-    					"type": "string",
-    					"description": "The industry for which the RFP is being written (e.g., 'Healthcare', 'IT', 'Construction')."
-    				},
-    				"custom_requirements": {
-    					"type": "string",
-    					"description": "Additional details or specific requirements to include in the section."
-    				}
-    			}
-    		}
-    	```
-    	You're in step 1.  Let's just generate the instructions to call the tool in JSON format. No extra text.
+     ```json
+      {
+       "name": "generate_rfp_section",
+       "description": "Generates a specific section of an RFP based on provided parameters.",
+       "parameters": {
+        "section": {
+         "type": "string",
+         "description": "The RFP section to generate (e.g., 'Introduction', 'Scope', 'Requirements')."
+        },
+        "industry": {
+         "type": "string",
+         "description": "The industry for which the RFP is being written (e.g., 'Healthcare', 'IT', 'Construction')."
+        },
+        "custom_requirements": {
+         "type": "string",
+         "description": "Additional details or specific requirements to include in the section."
+        }
+       }
+      }
+     ```
+     You're in step 1.  Let's just generate the instructions to call the tool in JSON format. No extra text.
 
 </details>
 
