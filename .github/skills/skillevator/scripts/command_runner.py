@@ -16,11 +16,10 @@ class CopilotCommandRunner:
         self._config = config
 
     def build_command(self, prompt: str) -> str:
-        return (
-            f"copilot --allow-tool=\"{self._config.allowed_tools}\""
-            f" --model {self._config.model}"
-            f" -p \"{prompt}\""
-        )
+        parts = ["copilot"]
+        parts += [f'--allow-tool="{t}"' for t in self._config.allowed_tools]
+        parts += [f"--model {self._config.model}", f'-p "{prompt}"']
+        return " ".join(parts)
 
     def run(self, prompt: str, cwd: Path) -> CopilotResponse:
         try:

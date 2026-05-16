@@ -89,8 +89,10 @@ def run_prompts(evaluations: list[Evaluation], iteration_dir: Path, baseline_dir
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run skill evaluations with the Copilot CLI.")
-    parser.add_argument("--skill-name", default="hello-user", help="Name of the skill to evaluate")
-    parser.add_argument("--model",      default="gpt-4.1",    help="Copilot model to use")
+    parser.add_argument("--skill-name",  default="hello-user", help="Name of the skill to evaluate")
+    parser.add_argument("--allow-tool",  dest="allowed_tools", action="append", default=[],
+                        metavar="TOOL",  help="Tool to allow (repeat for multiple, e.g. --allow-tool shell(python))")
+    parser.add_argument("--model",       default="gpt-4.1",    help="Copilot model to use")
     parser.add_argument("--times",   type=int, default=3,   help="Number of runs per evaluation")
     parser.add_argument("--timeout", type=int, default=120, help="Seconds before a CLI call is killed (default: 120)")
     return parser.parse_args()
@@ -98,7 +100,7 @@ def parse_args() -> argparse.Namespace:
 
 def main():
     args = parse_args()
-    config = EvaluationConfig(skill_name=args.skill_name, model=args.model, times=args.times, timeout=args.timeout)
+    config = EvaluationConfig(skill_name=args.skill_name, allowed_tools=args.allowed_tools, model=args.model, times=args.times, timeout=args.timeout)
     eval_runner = EvaluationRunner(config, CopilotCommandRunner(config), RunFactory(), RunDirectoryWriter())
     eval_location = setup_eval_location(config)
     baseline_dir = config.skillevator_evaluations_dir / config.skill_name
