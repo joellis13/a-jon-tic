@@ -22,5 +22,4 @@ class RunFactory:
             skill_name=response.skill_name,
             success=response.success,
             error=response.error,
-            files=[],
         )

@@ -62,6 +62,5 @@ class EvaluationRunner:
                 dest = run_dir / f.relative_to(tmp_path)
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(f, dest)
-                run.files.append(dest)
 
         return evaluation, run

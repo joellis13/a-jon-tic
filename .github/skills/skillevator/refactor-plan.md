@@ -67,17 +67,17 @@ scripts/
 
 ---
 
-### Phase 4 — Minor Cleanups
+### ✅ Phase 4 — Minor Cleanups — DONE
 
-These are quick, low-risk, standalone fixes.
+**Delivered:**
 
-| #   | Issue                                                                                          | Fix                                                     |
-| --- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| 4a  | `main()` called at module level (line 196)                                                     | Wrap in `if __name__ == "__main__":`                    |
-| 4b  | `skill_name` hardcoded as `"hello-user"` in `main()`                                           | Use `argparse` for `--skill-name`, `--model`, `--times` |
-| 4c  | ~~`SkillEvaluation.to_json_file(updated_skill_eval, eval_location)` called as unbound method~~ | ✅ Fixed in Phase 1                                     |
-| 4d  | `get_split_evaluations` can be a generator expression                                          | Simplify to list comprehension                          |
-| 4e  | `parents[1]` / `parents[4]` magic indices                                                      | Name them via constants or move into `EvaluationConfig` |
+| #   | Issue                                                              | Fix                                                                       |
+| --- | ------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| 4a  | `main()` called at module level                                    | ✅ Wrapped in `if __name__ == "__main__":`                                |
+| 4b  | `skill_name` hardcoded as `"hello-user"` in `main()`              | ✅ `parse_args()` with `--skill-name`, `--model`, `--times` via argparse  |
+| 4c  | ~~Unbound method call~~                                            | ✅ Fixed in Phase 1                                                       |
+| 4d  | `get_split_evaluations` used a manual loop                         | ✅ Simplified to one-line list comprehension                              |
+| 4e  | `parents[1]` / `parents[4]` magic indices in `evaluation_config`  | ✅ Replaced with `.parent.parent` chains with inline comments             |
 
 ---
 
@@ -103,7 +103,7 @@ Phase 4 (cleanups)  ← independent, can be done anytime
 | --------------------------------- | ------------------------------------------------------------ |
 | `scripts/evaluation_config.py`    | ✅ Done                                                      |
 | `scripts/evaluation_models.py`    | ✅ Done (`RunTask.config` + `TYPE_CHECKING` import)          |
-| `scripts/take_evaluation.py`      | 🔄 In progress (phases 1–3 done; Phase 4 remains)           |
+| `scripts/take_evaluation.py`      | ✅ Done (thin CLI entrypoint; all phases complete)          |
 | `scripts/command_runner.py`       | ✅ Done                                                      |
 | `scripts/copilot_models.py`       | ✅ Done (`format_summary` added)                             |
 | `scripts/run_factory.py`          | ✅ Done                                                      |

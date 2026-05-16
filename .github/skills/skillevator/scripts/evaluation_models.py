@@ -31,7 +31,6 @@ class Run:
     skill_name: Optional[str] = None
     success: Optional[bool] = None
     error: Optional[str] = None
-    files: list[Path] = field(default_factory=list)
 
 @dataclass
 class Evaluation:
