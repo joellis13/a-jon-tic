@@ -40,26 +40,16 @@ scripts/
 
 ---
 
-### Phase 2 — Abstract Command Execution (`CopilotCommandRunner`)
+### ✅ Phase 2 — Abstract Command Execution (`CopilotCommandRunner`) — DONE
 
-**File:** `scripts/command_runner.py`
+**Delivered:**
 
-**Problem:** `run_prompt` directly calls `subprocess.run`, making it impossible to unit-test
-without actually invoking the CLI.
+- `scripts/command_runner.py` — new `CopilotCommandRunner`; `build_command(prompt)` for logging, `run(prompt, cwd) -> CopilotResponse` for execution; `subprocess` lives here only
+- `scripts/take_evaluation.py` — `import subprocess` removed; `run_prompt` creates `CopilotCommandRunner(task.config)` and delegates to it; log line uses `runner.build_command()`
 
-**Action:**
+**Note:** `run_prompt` still instantiates the runner itself — Phase 3d's `EvaluationRunner` will receive it as an injected dependency, completing DIP.
 
-- Extract a `CopilotCommandRunner` class with a single `run(prompt: str, cwd: Path) -> CopilotResponse` method.
-- Command construction (currently line 64) moves into `CopilotCommandRunner`, driven by config fields.
-- In production, uses `subprocess.run`. In tests, can be replaced with a fake/mock.
-
-```python
-class CopilotCommandRunner:
-    def __init__(self, config: EvaluationConfig): ...
-    def run(self, prompt: str, cwd: Path) -> CopilotResponse: ...
-```
-
-**SOLID:** DIP (caller depends on runner abstraction, not subprocess directly), OCP (swap runner without touching callers)
+**SOLID applied:** DIP, OCP
 
 ---
 
@@ -170,7 +160,7 @@ Phase 4 (cleanups)  ← independent, can be done anytime
 | `scripts/evaluation_config.py`    | ✅ Done                                                      |
 | `scripts/evaluation_models.py`    | ✅ Done (`RunTask.config` + `TYPE_CHECKING` import)          |
 | `scripts/take_evaluation.py`      | 🔄 In progress (globals removed; more changes in phases 3–4) |
-| `scripts/command_runner.py`       | **New** — Phase 2                                            |
+| `scripts/command_runner.py`       | ✅ Done                                                      |
 | `scripts/run_factory.py`          | **New** — Phase 3b                                           |
 | `scripts/run_directory_writer.py` | **New** — Phase 3c                                           |
 | `scripts/evaluation_runner.py`    | **New** — Phase 3d                                           |

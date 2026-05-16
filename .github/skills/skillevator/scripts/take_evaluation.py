@@ -5,9 +5,9 @@ import json
 from pprint import pprint
 from pathlib import Path
 import shutil
-import subprocess
 import tempfile
 
+from command_runner import CopilotCommandRunner
 from evaluation_config import EvaluationConfig, EVALS, EVALS_JSON
 from evaluation_models import ExtEvaluation, SkillEvaluation, Evaluation, Run, RunTask
 from copilot_models import CopilotResponse
@@ -38,22 +38,13 @@ def run_prompt(task: RunTask, cwd: Path) -> tuple[Evaluation, Run, Path]:
     evaluation = task.evaluation
     run_index = task.run_index
     total_runs = task.total_runs
-    config = task.config
     eval_id = evaluation.id
     prompt = evaluation.prompt
-    command = f"copilot --allow-tool=\"{config.allowed_tools}\" --model {config.model} -p \"{prompt}\""
-    print(f"[Run {run_index + 1}/{total_runs}] command {eval_id}: {command}")
 
-    result = subprocess.run(
-        command,
-        shell=True,
-        capture_output=True,
-        text=True,
-        encoding='utf-8',
-        cwd=str(cwd)
-    )
+    runner = CopilotCommandRunner(task.config)
+    print(f"[Run {run_index + 1}/{total_runs}] command {eval_id}: {runner.build_command(prompt)}")
 
-    response = CopilotResponse.from_subprocess_result(result)
+    response = runner.run(prompt, cwd)
 
     print("\n==================================================")
     print(f"result {eval_id} (run {run_index + 1}/{total_runs}): ")
