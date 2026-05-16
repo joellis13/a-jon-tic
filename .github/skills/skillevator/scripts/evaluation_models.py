@@ -48,13 +48,15 @@ class ExtEvaluation(Evaluation):
     include_skill: bool = False
 
     def __init__(self, evaluation: Evaluation, include_skill: bool):
-        self.id = evaluation.id
-        self.evaluation_name = evaluation.evaluation_name
-        self.prompt = evaluation.prompt
-        self.general_expectation = evaluation.general_expectation
-        self.criteria = evaluation.criteria
-        self.with_skill_runs = evaluation.with_skill_runs
-        self.baseline_runs = evaluation.baseline_runs
+        super().__init__(
+            id=evaluation.id,
+            evaluation_name=evaluation.evaluation_name,
+            prompt=evaluation.prompt,
+            general_expectation=evaluation.general_expectation,
+            criteria=evaluation.criteria,
+            with_skill_runs=evaluation.with_skill_runs,
+            baseline_runs=evaluation.baseline_runs,
+        )
         self.include_skill = include_skill
 
 @dataclass
