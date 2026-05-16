@@ -9,7 +9,7 @@ from evaluation_config import EvaluationConfig, EVALS, EVALS_JSON
 from evaluation_models import ExtEvaluation, SkillEvaluation, Evaluation, RunTask
 from evaluation_runner import EvaluationRunner
 from run_factory import RunFactory
-from run_directory_writer import RunDirectoryWriter
+from run_directory_writer import RunDirectoryWriter, RESPONSE_FILE, BASELINE
 
 
 def get_results_dir(config: EvaluationConfig) -> Path:
@@ -40,14 +40,17 @@ def get_split_evaluations(evaluations: list[Evaluation]) -> list[ExtEvaluation]:
     return [ExtEvaluation(e, include) for e in evaluations for include in (True, False)]
 
 
-def run_prompts(evaluations: list[Evaluation], iteration_dir: Path, eval_runner: EvaluationRunner) -> list[Evaluation]:
+def run_prompts(evaluations: list[Evaluation], iteration_dir: Path, baseline_dir: Path, eval_runner: EvaluationRunner) -> list[Evaluation]:
     """Run each evaluation multiple times concurrently."""
     config = eval_runner.config
-    tasks = [
-        RunTask(evaluation, run_num, config.times, iteration_dir, config)
-        for evaluation in get_split_evaluations(evaluations)
-        for run_num in range(config.times)
-    ]
+    tasks = []
+    for evaluation in get_split_evaluations(evaluations):
+        for run_num in range(config.times):
+            if not evaluation.include_skill:
+                run_dir = baseline_dir / BASELINE / evaluation.evaluation_name / str(run_num + 1)
+                if (run_dir / RESPONSE_FILE).exists():
+                    continue  # baseline already on disk; skip re-run
+            tasks.append(RunTask(evaluation, run_num, config.times, iteration_dir, config, baseline_dir))
 
     with ThreadPoolExecutor() as executor:
         results = list(executor.map(eval_runner.run_task, tasks))
@@ -75,10 +78,11 @@ def main():
     config = EvaluationConfig(skill_name=args.skill_name, model=args.model, times=args.times)
     eval_runner = EvaluationRunner(config, CopilotCommandRunner(config), RunFactory(), RunDirectoryWriter())
     eval_location = setup_eval_location(config)
+    baseline_dir = config.skillevator_evaluations_dir / config.skill_name
     iteration_dir = get_results_dir(config)
     skill_eval = get_evals(config)
     evaluations = skill_eval.evaluations
-    evaluations_with_runs = run_prompts(evaluations, iteration_dir, eval_runner)
+    evaluations_with_runs = run_prompts(evaluations, iteration_dir, baseline_dir, eval_runner)
     pprint([{"id": e.id, "runs_count": len(e.runs)} for e in evaluations_with_runs])
     updated_skill_eval = copy.deepcopy(skill_eval)
     updated_skill_eval.evaluations = evaluations_with_runs

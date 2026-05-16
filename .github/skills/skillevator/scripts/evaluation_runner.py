@@ -6,7 +6,7 @@ from command_runner import CopilotCommandRunner
 from evaluation_config import EvaluationConfig
 from evaluation_models import Evaluation, Run, RunTask
 from run_factory import RunFactory
-from run_directory_writer import RunDirectoryWriter, WITH_SKILL, WITHOUT_SKILL
+from run_directory_writer import RunDirectoryWriter, BASELINE
 
 
 class EvaluationRunner:
@@ -37,8 +37,10 @@ class EvaluationRunner:
         total_runs = task.total_runs
         prompt = evaluation.prompt
 
-        skill_folder = WITH_SKILL if evaluation.include_skill else WITHOUT_SKILL
-        run_dir = task.iteration_dir / evaluation.evaluation_name / skill_folder / str(run_index + 1)
+        if evaluation.include_skill:
+            run_dir = task.iteration_dir / evaluation.evaluation_name / str(run_index + 1)
+        else:
+            run_dir = task.baseline_dir / BASELINE / evaluation.evaluation_name / str(run_index + 1)
         run_dir.mkdir(parents=True, exist_ok=True)
 
         with tempfile.TemporaryDirectory() as tmp:

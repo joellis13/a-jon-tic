@@ -9,7 +9,7 @@ STDOUT_FILE   = "stdout.txt"
 STDERR_FILE   = "stderr.txt"
 META_FILE     = "meta.json"
 WITH_SKILL    = "with_skill"
-WITHOUT_SKILL = "without_skill"
+BASELINE      = "baseline"
 
 
 class RunDirectoryWriter:

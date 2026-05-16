@@ -61,6 +61,7 @@ class RunTask:
     total_runs: int
     iteration_dir: Path
     config: EvaluationConfig  # carries config into executor.map workers
+    baseline_dir: Path        # skill-level dir; where baseline/ lives
 
 
 @dataclass

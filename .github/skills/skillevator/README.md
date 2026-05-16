@@ -34,11 +34,11 @@ take_evaluation.py          ← CLI entry point
     │
     └── run_prompts()           ← ThreadPoolExecutor over all tasks
         │
-        ├── get_split_evaluations()     ← duplicate each eval: with_skill + without_skill
+        ├── get_split_evaluations()     ← duplicate each eval: with_skill + baseline
         │
         └── EvaluationRunner.run_task() ← per task (runs concurrently)
             ├── copy .github/ into a temp dir
-            ├── optionally remove the skill folder (without_skill variant)
+            ├── optionally remove the skill folder (baseline variant)
             ├── CopilotCommandRunner.run()      → CopilotResponse
             ├── CopilotResponse.format_summary()  → print progress
             ├── RunFactory.create()             → Run
