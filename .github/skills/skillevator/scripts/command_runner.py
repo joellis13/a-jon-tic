@@ -36,5 +36,6 @@ class CopilotCommandRunner:
         except subprocess.TimeoutExpired:
             return CopilotResponse(
                 success=False,
+                returncode=-1,
                 error=f"timeout after {self._config.timeout}s",
             )

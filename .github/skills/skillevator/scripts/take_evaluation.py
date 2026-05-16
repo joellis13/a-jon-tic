@@ -14,8 +14,8 @@ from run_factory import RunFactory
 from run_directory_writer import RunDirectoryWriter, RESPONSE_FILE, BASELINE, META_FILE
 
 
-def _baseline_is_stale(eval_name: str, baseline_dir: Path, model: str, prompt: str) -> bool:
-    """Return True if the cached baseline was run with a different model or prompt."""
+def _baseline_is_stale(eval_name: str, baseline_dir: Path, model: str, prompt: str, allowed_tools: list[str]) -> bool:
+    """Return True if the cached baseline was run with a different model, prompt, or allowed_tools."""
     meta_path = baseline_dir / BASELINE / eval_name / "1" / META_FILE
     if not meta_path.exists():
         return False
@@ -25,7 +25,8 @@ def _baseline_is_stale(eval_name: str, baseline_dir: Path, model: str, prompt: s
     cached_prompt = meta.get("prompt")
     if cached_model is None or cached_prompt is None:
         return False  # pre-feature meta; can't determine staleness, assume valid
-    return cached_model != model or cached_prompt != prompt
+    cached_tools = meta.get("allowed_tools")
+    return cached_model != model or cached_prompt != prompt or cached_tools != allowed_tools
 
 
 def get_results_dir(config: EvaluationConfig) -> Path:
@@ -63,7 +64,7 @@ def run_prompts(evaluations: list[Evaluation], iteration_dir: Path, baseline_dir
     for evaluation in get_split_evaluations(evaluations):
         if not evaluation.include_skill:
             stale_dir = baseline_dir / BASELINE / evaluation.evaluation_name
-            if stale_dir.exists() and _baseline_is_stale(evaluation.evaluation_name, baseline_dir, config.model, evaluation.prompt):
+            if stale_dir.exists() and _baseline_is_stale(evaluation.evaluation_name, baseline_dir, config.model, evaluation.prompt, config.allowed_tools):
                 shutil.rmtree(stale_dir)
                 print(f"[baseline] Stale baseline removed for '{evaluation.evaluation_name}' (model or prompt changed) — will rerun")
         for run_num in range(config.times):

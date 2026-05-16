@@ -49,7 +49,7 @@ class CopilotResponse:
         obj.success = result.returncode == 0
 
         # Parse tokens from stderr(Tokens    ↑ 96.2k • ↓ 109 • 13.3k (cached))
-        tokens_match = re.search(r'Tokens\s+↑\s+([\d.]+k?)\s*•\s*↓\s+([\d.]+)\s*•\s+([\d.]+k?)', result.stderr)
+        tokens_match = re.search(r'Tokens\s+↑\s+([\d.]+k?)\s*•\s*↓\s+([\d.]+k?)\s*•\s+([\d.]+k?)', result.stderr)
         if tokens_match:
             obj.tokens_input  = _parse_token_count(tokens_match.group(1))
             obj.tokens_output = _parse_token_count(tokens_match.group(2))
