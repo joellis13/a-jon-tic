@@ -16,7 +16,6 @@ class CopilotResponse:
     """Parsed response from a Copilot CLI command."""
     skill_name: Optional[str] = None
     success: bool = False
-    message: str = ""
     error: Optional[str] = None
     stdout_raw: str = ""
     stderr_raw: str = ""
@@ -49,12 +48,7 @@ class CopilotResponse:
 
         obj.success = result.returncode == 0
 
-        # Get the main message (everything after skill name header)
-        lines = result.stdout.split("\n")
-        message_lines = [l for l in lines[2:] if l.strip()]
-        obj.message = "\n".join(message_lines)
-
-        # Parse tokens from stderr (Tokens    ↑ 96.2k • ↓ 109 • 13.3k (cached))
+        # Parse tokens from stderr(Tokens    ↑ 96.2k • ↓ 109 • 13.3k (cached))
         tokens_match = re.search(r'Tokens\s+↑\s+([\d.]+k?)\s*•\s*↓\s+([\d.]+)\s*•\s+([\d.]+k?)', result.stderr)
         if tokens_match:
             obj.tokens_input  = _parse_token_count(tokens_match.group(1))
@@ -83,6 +77,6 @@ class CopilotResponse:
             f"tokens_output: {self.tokens_output}",
             f"tokens_cached: {self.tokens_cached}",
             f"duration_seconds: {self.duration_seconds}",
-            f"message: {self.message}",
+            f"message: {self.stdout_raw}",
             f"{sep}\n",
         ])

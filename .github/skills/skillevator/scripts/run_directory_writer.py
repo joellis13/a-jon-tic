@@ -19,7 +19,7 @@ class RunDirectoryWriter:
     """
 
     def write(self, run_dir: Path, response: CopilotResponse, evaluation: ExtEvaluation, model: str) -> None:
-        (run_dir / RESPONSE_FILE).write_text(response.message, encoding="utf-8")
+        (run_dir / RESPONSE_FILE).write_text(response.stdout_raw, encoding="utf-8")
         (run_dir / STDOUT_FILE).write_text(response.stdout_raw, encoding="utf-8")
         (run_dir / STDERR_FILE).write_text(response.stderr_raw, encoding="utf-8")
         (run_dir / META_FILE).write_text(json.dumps({

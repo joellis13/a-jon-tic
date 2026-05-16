@@ -13,7 +13,7 @@ class RunFactory:
         return Run(
             id=run_index + 1,
             include_skill=evaluation.include_skill,
-            response=response.message,
+            response=response.stdout_raw,
             tokens_input=response.tokens_input,
             tokens_output=response.tokens_output,
             tokens_cached=response.tokens_cached,
