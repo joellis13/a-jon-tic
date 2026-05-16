@@ -13,13 +13,14 @@ class RunFactory:
         return Run(
             id=run_index + 1,
             include_skill=evaluation.include_skill,
-            response=response.message,
+            response=response.stdout_raw,
             tokens_input=response.tokens_input,
             tokens_output=response.tokens_output,
             tokens_cached=response.tokens_cached,
             duration_seconds=response.duration_seconds,
             assessment=None,
             skill_name=response.skill_name,
+            skill_triggered=response.skill_name is not None,
             success=response.success,
             error=response.error,
         )

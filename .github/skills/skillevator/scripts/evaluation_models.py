@@ -23,12 +23,13 @@ class Run:
     id: int
     include_skill: bool
     response: str
-    tokens_input: Optional[str]
-    tokens_output: Optional[str]
-    tokens_cached: Optional[str]
+    tokens_input: Optional[int]
+    tokens_output: Optional[int]
+    tokens_cached: Optional[int]
     duration_seconds: Optional[float]
     assessment: Optional[Assessment]
     skill_name: Optional[str] = None
+    skill_triggered: Optional[bool] = None
     success: Optional[bool] = None
     error: Optional[str] = None
 
@@ -39,19 +40,23 @@ class Evaluation:
     prompt: str
     general_expectation: str
     criteria: list[Criterion]
-    runs: list[Run] = field(default_factory=list)
+    with_skill_runs: list[Run] = field(default_factory=list)
+    baseline_runs:   list[Run] = field(default_factory=list)
 
 @dataclass 
 class ExtEvaluation(Evaluation):
     include_skill: bool = False
 
     def __init__(self, evaluation: Evaluation, include_skill: bool):
-        self.id = evaluation.id
-        self.evaluation_name = evaluation.evaluation_name
-        self.prompt = evaluation.prompt
-        self.general_expectation = evaluation.general_expectation
-        self.criteria = evaluation.criteria
-        self.runs = evaluation.runs
+        super().__init__(
+            id=evaluation.id,
+            evaluation_name=evaluation.evaluation_name,
+            prompt=evaluation.prompt,
+            general_expectation=evaluation.general_expectation,
+            criteria=evaluation.criteria,
+            with_skill_runs=evaluation.with_skill_runs,
+            baseline_runs=evaluation.baseline_runs,
+        )
         self.include_skill = include_skill
 
 @dataclass
@@ -64,6 +69,15 @@ class RunTask:
     baseline_dir: Path        # skill-level dir; where baseline/ lives
 
 
+def _parse_runs(e: dict, include_skill: bool, parse_run) -> list[Run]:
+    """Load runs from either the new split keys or the legacy 'runs' list."""
+    key = "with_skill_runs" if include_skill else "baseline_runs"
+    if key in e:
+        return [parse_run(r) for r in e[key]]
+    # Legacy format: single 'runs' list — split by include_skill flag
+    return [parse_run(r) for r in e.get("runs", []) if r.get("include_skill") == include_skill]
+
+
 @dataclass
 class SkillEvaluation:
     skill_name: str
@@ -71,6 +85,9 @@ class SkillEvaluation:
 
     @classmethod
     def from_dict(cls, data: dict) -> "SkillEvaluation":
+        def parse_run(r: dict) -> Run:
+            return Run(**{**r, "assessment": Assessment(**r["assessment"]) if r.get("assessment") else None})
+
         return cls(
             skill_name=data["skill_name"],
             evaluations=[
@@ -80,12 +97,8 @@ class SkillEvaluation:
                     prompt=e["prompt"],
                     general_expectation=e["general_expectation"],
                     criteria=[Criterion(**c) for c in e.get("criteria", [])],
-                    runs=[
-                        Run(
-                            **{**r, "assessment": Assessment(**r["assessment"]) if r.get("assessment") else None}
-                        )
-                        for r in e.get("runs", [])
-                    ],
+                    with_skill_runs=_parse_runs(e, include_skill=True,  parse_run=parse_run),
+                    baseline_runs=  _parse_runs(e, include_skill=False, parse_run=parse_run),
                 )
                 for e in data.get("evaluations", [])
             ],
@@ -93,12 +106,12 @@ class SkillEvaluation:
 
     @classmethod
     def from_json_file(cls, path: Path) -> "SkillEvaluation":
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             return cls.from_dict(json.load(f))
 
     def to_dict(self) -> dict:
         return asdict(self)
 
     def to_json_file(self, path: Path) -> None:
-        with open(path, "w") as f:
-            json.dump(self.to_dict(), f, indent=2)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(self.to_dict(), f, indent=2, ensure_ascii=False)

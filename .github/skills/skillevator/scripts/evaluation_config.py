@@ -13,9 +13,10 @@ EVALS_JSON   = "evals.json"
 @dataclass
 class EvaluationConfig:
     skill_name: str
+    allowed_tools: list[str] = field(default_factory=list)  # no tools allowed unless specified
     model: str = "gpt-4.1"
-    allowed_tools: str = "shell(python)"
     times: int = 3
+    timeout: int = 120
 
     project_root: Path                = field(init=False, repr=False)
     skillevator_root: Path            = field(init=False, repr=False)

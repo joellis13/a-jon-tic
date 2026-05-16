@@ -54,10 +54,10 @@ class EvaluationRunner:
 
             print(f"[Run {run_index + 1}/{total_runs}] command {evaluation.id}: {self._runner.build_command(prompt)}")
             response = self._runner.run(prompt, tmp_path)
-            print(response.format_summary(evaluation.id, run_index, total_runs, evaluation.include_skill))
+            print(response.format_summary(evaluation.id, evaluation.evaluation_name, evaluation.prompt, run_index, total_runs, evaluation.include_skill))
 
             run = self._factory.create(response, evaluation, run_index)
-            self._writer.write(run_dir, response, evaluation)
+            self._writer.write(run_dir, response, evaluation, self.config.model, self.config.allowed_tools)
 
             after = {f for f in tmp_path.rglob("*") if f.is_file()}
             for f in after - before:

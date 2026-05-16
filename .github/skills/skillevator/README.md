@@ -4,23 +4,40 @@ Runs a skill's evaluations against the Copilot CLI and records the results.
 
 ## Usage
 
+Run from the **repository root**:
+
 ```bash
-cd .github/skills/skillevator/scripts
-python take_evaluation.py --skill-name hello-user --model gpt-4.1 --times 3
+# Minimal (no tools, hello-user skill, default model)
+python .github/skills/skillevator/scripts/take_evaluation.py
+
+# Typical — specify skill and allow a tool
+python .github/skills/skillevator/scripts/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)"
+
+# Full options
+python .github/skills/skillevator/scripts/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)" --model gpt-4.1 --times 3 --timeout 120
 ```
 
-| Flag           | Default      | Description                                  |
-| -------------- | ------------ | -------------------------------------------- |
-| `--skill-name` | `hello-user` | Skill directory name under `.github/skills/` |
-| `--model`      | `gpt-4.1`    | Copilot model passed to `--model`            |
-| `--times`      | `3`          | Number of runs per evaluation prompt         |
+Pass `--allow-tool` once per tool. It mirrors the Copilot CLI flag directly.
+
+```bash
+# Multiple tools
+python .github/skills/skillevator/scripts/take_evaluation.py --skill-name my-skill --allow-tool "shell(python)" --allow-tool "builtin"
+```
+
+| Flag           | Required | Default      | Description                                               |
+| -------------- | -------- | ------------ | --------------------------------------------------------- |
+| `--allow-tool` | no       | _(none)_     | Tool to allow; repeat for multiple (mirrors Copilot CLI)  |
+| `--skill-name` | no       | `hello-user` | Skill directory name under `.github/skills/`              |
+| `--model`      | no       | `gpt-4.1`    | Copilot model passed to `--model`                         |
+| `--times`      | no       | `3`          | Number of runs per evaluation prompt                      |
+| `--timeout`    | no       | `120`        | Seconds before a CLI call is killed                       |
 
 ## Execution Order
 
 ```text
 take_evaluation.py          ← CLI entry point
 │
-├── parse_args()            ← resolve --skill-name / --model / --times
+├── parse_args()            ← resolve --skill-name / --allow-tool / --model / --times / --timeout
 ├── EvaluationConfig        ← derive all paths from __file__ location
 │
 ├── CopilotCommandRunner    ← wraps subprocess; receives config
