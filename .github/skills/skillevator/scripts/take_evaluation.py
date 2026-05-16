@@ -7,7 +7,7 @@ import shutil
 import subprocess
 import tempfile
 
-from evaluation_models import ExtEvaluation, SkillEvaluation, Evaluation, Run
+from evaluation_models import ExtEvaluation, SkillEvaluation, Evaluation, Run, RunTask
 from copilot_models import CopilotResponse
 
 SKILL_NAME = ""
@@ -53,9 +53,11 @@ def get_evals() -> SkillEvaluation :
 
     return skill_eval
 
-def run_prompt(args: tuple[ExtEvaluation, int, int], cwd: Path = PROJECT_ROOT) -> tuple[Evaluation, Run]:
+def run_prompt(task: RunTask, cwd: Path = PROJECT_ROOT) -> tuple[Evaluation, Run]:
     """Run a single prompt and return the evaluation + run result."""
-    evaluation, run_index, total_runs = args
+    evaluation = task.evaluation
+    run_index = task.run_index
+    total_runs = task.total_runs
     eval_id = evaluation.id
     prompt = evaluation.prompt
     command = "copilot --allow-tool=\"shell(python)\" --model gpt-4.1 -p \"" + prompt + "\""
@@ -99,13 +101,12 @@ def run_prompt(args: tuple[ExtEvaluation, int, int], cwd: Path = PROJECT_ROOT) -
     
     return evaluation, run
 
-def run_prompt_in_temp_dir(args: tuple[ExtEvaluation, int, int]) -> tuple[Evaluation, Run]:
+def run_prompt_in_temp_dir(task: RunTask) -> tuple[Evaluation, Run]:
     with tempfile.TemporaryDirectory() as tmp:
-        evaluation, run_index, total_runs = args
         tmp_path = Path(tmp)
         shutil.copytree(GITHUB_DIR, tmp_path / GITHUB)
 
-        return run_prompt(args, cwd=tmp_path)
+        return run_prompt(task, cwd=tmp_path)
 
 def get_split_evaluations(evaluations: list[Evaluation]) -> list[ExtEvaluation]:
     split_evaluations = []
@@ -117,12 +118,12 @@ def get_split_evaluations(evaluations: list[Evaluation]) -> list[ExtEvaluation]:
 
     return split_evaluations
 
-def run_prompts(evaluations: list[Evaluation], times: int = 3) -> list[Evaluation]:
+def run_prompts(evaluations: list[Evaluation], iteration_dir: Path, times: int = 3) -> list[Evaluation]:
     """Run each evaluation multiple times concurrently."""
     split_evaluations = get_split_evaluations(evaluations)
-    # Create tasks: (evaluation, run_index, total_runs) for each evaluation × times
+    # Create tasks: RunTask for each evaluation × times
     tasks = [
-        (evaluation, run_num, times)
+        RunTask(evaluation, run_num, times, iteration_dir)
         for evaluation in split_evaluations
         for run_num in range(times)
     ]
@@ -145,9 +146,10 @@ def main():
     skill_name = "hello-user"
     set_skill_name(skill_name)
     eval_location = setup_eval_location()
+    iteration_dir = get_results_dir()
     skill_eval = get_evals()
     evaluations = skill_eval.evaluations
-    evaluations_with_runs = run_prompts(evaluations, times=3)
+    evaluations_with_runs = run_prompts(evaluations, iteration_dir, times=3)
     pprint([{"id": e.id, "runs_count": len(e.runs)} for e in evaluations_with_runs])
     updated_skill_eval = copy.deepcopy(skill_eval)
     updated_skill_eval.evaluations = evaluations_with_runs

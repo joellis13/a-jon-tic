@@ -23,11 +23,15 @@ class Run:
     tokens_cached: Optional[str]
     duration_seconds: Optional[float]
     assessment: Optional[Assessment]
+    skill_name: Optional[str] = None
+    success: Optional[bool] = None
+    error: Optional[str] = None
     files: list[Path] = field(default_factory=list)
 
 @dataclass
 class Evaluation:
     id: int
+    evaluation_name: str
     prompt: str
     general_expectation: str
     criteria: list[Criterion]
@@ -39,13 +43,21 @@ class ExtEvaluation(Evaluation):
 
     def __init__(self, evaluation: Evaluation, include_skill: bool):
         self.id = evaluation.id
+        self.evaluation_name = evaluation.evaluation_name
         self.prompt = evaluation.prompt
         self.general_expectation = evaluation.general_expectation
         self.criteria = evaluation.criteria
         self.runs = evaluation.runs
         self.include_skill = include_skill
 
-    
+@dataclass
+class RunTask:
+    evaluation: ExtEvaluation
+    run_index: int
+    total_runs: int
+    iteration_dir: Path
+
+
 @dataclass
 class SkillEvaluation:
     skill_name: str
@@ -58,6 +70,7 @@ class SkillEvaluation:
             evaluations=[
                 Evaluation(
                     id=e["id"],
+                    evaluation_name=e["evaluation_name"],
                     prompt=e["prompt"],
                     general_expectation=e["general_expectation"],
                     criteria=[Criterion(**c) for c in e.get("criteria", [])],

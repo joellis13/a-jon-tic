@@ -3,6 +3,7 @@
   "evaluations": [
     {
       "id": 1,
+      "evaluation_name": "hello",
       "prompt": "Hello!",
       "general_expectation": "ASCII-art-style greeting produced by running scripts/hello_ascii.py for the current user",
       "criteria": [
@@ -26,6 +27,7 @@
     },
     {
       "id": 2,
+      "evaluation_name": "hey-copilot",
       "prompt": "Hey Copilot, how's it going?",
       "general_expectation": "ASCII-art-style greeting via hello_ascii.py — skill should trigger even on casual non-'hello' greetings",
       "files": [],
@@ -50,6 +52,7 @@
     },
     {
       "id": 3,
+      "evaluation_name": "hello-copilot",
       "prompt": "Hello copilot",
       "general_expectation": "ASCII-art-style greeting via hello_ascii.py — style should be consistent with the script output used in evals 1 and 2",
       "files": [],

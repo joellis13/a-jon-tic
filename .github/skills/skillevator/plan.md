@@ -58,48 +58,47 @@ The raw message text from `CopilotResponse.message`.
 
 ## Tasks
 
-### Phase 1 — Bug Fixes (no deps, do first)
+### Phase 1 — Bug Fixes ✅
 
-**`model-fix-none-assessment`** — Fix null-assessment crash in `from_dict`  
+**`model-fix-none-assessment`** ✅ — Fix null-assessment crash in `from_dict`  
 `SkillEvaluation.from_dict` always calls `Assessment(**r["assessment"])` with no null check.
 New runs always have `assessment: None`, so this crashes on reload.  
 Fix: `assessment=Assessment(**r["assessment"]) if r.get("assessment") else None`
 
-**`fix-cwd-bug`** — Fix cwd bug in `run_prompt`  
+**`fix-cwd-bug`** ✅ — Fix cwd bug in `run_prompt`  
 `run_prompt` hardcodes `cwd=str(PROJECT_ROOT)`, so the subprocess always runs against the
-real project regardless of which temp dir was set up. Add a `cwd: Path` parameter to
-`run_prompt` and pass the temp dir path in from `run_prompt_in_temp_dir`.
+real project regardless of which temp dir was set up. Added `cwd: Path = PROJECT_ROOT`
+parameter to `run_prompt`; `run_prompt_in_temp_dir` now passes `cwd=tmp_path`.
 
 ---
 
-### Phase 2 — Data Model Changes
+### Phase 2 — Data Model Changes ✅
 
-**`model-eval-name`** — Add `evaluation_name` to `Evaluation`  
-Add `evaluation_name: str` field to the `Evaluation` dataclass. Propagate in
-`ExtEvaluation.__init__`. Update `SkillEvaluation.from_dict` to parse it.
+**`model-eval-name`** ✅ — Add `evaluation_name` to `Evaluation`  
+Added `evaluation_name: str` to `Evaluation` (after `id`), propagated in
+`ExtEvaluation.__init__`, and added to `SkillEvaluation.from_dict`.
 
-**`model-run-fields`** — Add `skill_name`, `success`, `error` to `Run`  
-`Run` does not currently capture `skill_name` (which skill fired), `success`, or `error`
-from `CopilotResponse`. Add these fields. `stdout_raw`, `stderr_raw`, and `returncode`
-go to `meta.json` only, not the model.
+**`model-run-fields`** ✅ — Add `skill_name`, `success`, `error` to `Run`  
+Added `skill_name: Optional[str] = None`, `success: Optional[bool] = None`,
+`error: Optional[str] = None` to `Run` (with defaults, after required fields, before
+`files`). Old serialized JSON without these keys safely falls back to `None` via the
+`**r` spread in `from_dict`. `stdout_raw`, `stderr_raw`, `returncode` go to files only.
 
-**`evals-json-eval-name`** _(depends on `model-eval-name`)_  
-Add a short `evaluation_name` string to each entry in `hello-user/evals/evals.json`.
-These become directory names — keep them lowercase, hyphen-separated.
-Examples: `"hello"`, `"hey-copilot"`, `"hello-copilot"`.
+**`evals-json-eval-name`** ✅ _(depends on `model-eval-name`)_  
+Added `evaluation_name` to all three entries in `hello-user/evals/evals.json`:
+`"hello"`, `"hey-copilot"`, `"hello-copilot"`.
 
 ---
 
-### Phase 3 — Wiring
+### Phase 3 — Wiring ✅
 
-**`wire-results-dir`** — Wire up `get_results_dir()` in `main()`  
-`get_results_dir()` is defined but never called. Call it in `main()` and pass
-`iteration_dir` into `run_prompts`.
+**`wire-results-dir`** ✅ — Wire up `get_results_dir()` in `main()`  
+Called `get_results_dir()` in `main()` to create the versioned `iteration-NN` directory.
+`iteration_dir` is now passed into `run_prompts` as an explicit parameter and flows
+through to every `RunTask`.
 
-**`args-tuple-refactor`** _(depends on `wire-results-dir`)_  
-The task args tuple `(evaluation, run_index, total_runs)` needs to carry `iteration_dir`
-too. Replace the tuple with a `RunTask` dataclass defined in `evaluation_models.py`
-(all dataclasses live there):
+**`args-tuple-refactor`** ✅ _(depends on `wire-results-dir`)_  
+Added `RunTask` dataclass to `evaluation_models.py` (after `ExtEvaluation`):
 
 ```python
 @dataclass
@@ -110,7 +109,11 @@ class RunTask:
     iteration_dir: Path
 ```
 
-Update `run_prompts`, `run_prompt_in_temp_dir`, and `run_prompt` accordingly.
+Replaced the `(evaluation, run_num, times)` tuple throughout:
+
+- `run_prompts` builds `RunTask(evaluation, run_num, times, iteration_dir)`
+- `run_prompt_in_temp_dir(task: RunTask)` unpacks via attribute access
+- `run_prompt(task: RunTask, cwd)` unpacks `task.evaluation / .run_index / .total_runs`
 
 ---
 
@@ -160,19 +163,19 @@ clean and machine-readable. Plain text is also easier to inspect when debugging 
 ## Dependency Graph
 
 ```
-model-fix-none-assessment   (no deps)
-fix-cwd-bug                 (no deps)
+model-fix-none-assessment   ✅
+fix-cwd-bug                 ✅
   └─ conditional-copy
 
-model-eval-name             (no deps)
-  └─ evals-json-eval-name
+model-eval-name             ✅
+  └─ evals-json-eval-name  ✅
   └─ output-dir-structure
 
-model-run-fields            (no deps)
+model-run-fields            ✅
   └─ write-response-file
 
-wire-results-dir            (no deps)
-  └─ args-tuple-refactor
+wire-results-dir            ✅
+  └─ args-tuple-refactor   ✅
        └─ output-dir-structure
             └─ write-response-file
             └─ copy-created-files
