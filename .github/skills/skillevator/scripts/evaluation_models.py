@@ -93,12 +93,12 @@ class SkillEvaluation:
 
     @classmethod
     def from_json_file(cls, path: Path) -> "SkillEvaluation":
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             return cls.from_dict(json.load(f))
 
     def to_dict(self) -> dict:
         return asdict(self)
 
     def to_json_file(self, path: Path) -> None:
-        with open(path, "w") as f:
-            json.dump(self.to_dict(), f, indent=2)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(self.to_dict(), f, indent=2, ensure_ascii=False)
