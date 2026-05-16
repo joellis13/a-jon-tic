@@ -117,37 +117,37 @@ Replaced the `(evaluation, run_num, times)` tuple throughout:
 
 ---
 
-### Phase 4 — Conditional Copy & File Capture
+### Phase 4 — Conditional Copy & File Capture ✅
 
-**`conditional-copy`** _(depends on `fix-cwd-bug`)_  
-In `run_prompt_in_temp_dir`, when `include_skill=False`, after copying `.github/` into
-the temp dir, call `shutil.rmtree(tmp_path / GITHUB / SKILLS / SKILL_NAME)` to remove
-the skill directory. The subprocess will then run as if the skill doesn't exist.
+**`conditional-copy`** ✅ _(depends on `fix-cwd-bug`)_  
+After `copytree`, when `include_skill=False`, calls
+`shutil.rmtree(tmp_path / GITHUB / SKILLS / SKILL_NAME)` to remove the skill directory.
+The subprocess runs as if the skill doesn't exist.
 
-**`snapshot-temp-dir`**  
-Before calling `run_prompt`, record the set of all file paths currently in the temp dir.
-After the run completes, diff the before/after sets to find newly created files.
-Return the list of new paths alongside `(evaluation, run)`.
+**`snapshot-temp-dir`** ✅  
+Before calling `run_prompt`, snapshots `{f for f in tmp_path.rglob("*") if f.is_file()}`.
+After the run, diffs before/after sets to find newly created files.
 
-**`copy-created-files`** _(depends on `snapshot-temp-dir`, `output-dir-structure`)_  
-Copy each newly created file from the temp dir into the `<run_num>/` output directory,
-preserving relative paths. Populate `Run.files` with the destination paths.
+**`copy-created-files`** ✅ _(depends on `snapshot-temp-dir`, `output-dir-structure`)_  
+For each new file, copies it to `run_dir / f.relative_to(tmp_path)` (creating parent dirs),
+then appends the destination path to `run.files`.
 
 ---
 
-### Phase 5 — Output File Writing
+### Phase 5 — Output File Writing ✅
 
-**`output-dir-structure`** _(depends on `args-tuple-refactor`, `model-eval-name`, `wire-results-dir`)_  
-In `run_prompt`, resolve and create the output directory:
-
+**`output-dir-structure`** ✅ _(depends on `args-tuple-refactor`, `model-eval-name`, `wire-results-dir`)_  
+In `run_prompt`, computes and creates:
 ```
 <iteration_dir>/<evaluation_name>/<with_skill|without_skill>/<run_num>/
 ```
+`run_prompt` return type changed to `tuple[Evaluation, Run, Path]`. `run_prompt_in_temp_dir`
+unpacks the triple and continues returning `(evaluation, run)`, holding `run_dir` locally
+for Phase 4 file copying. `run_prompts` is unchanged.
 
-Use `"with_skill"` and `"without_skill"` as the literal folder names.
-
-**`write-response-file`** _(depends on `model-run-fields`, `output-dir-structure`)_  
-After each run, write four files into `<run_num>/`:
+**`write-response-file`** ✅ _(depends on `model-run-fields`, `output-dir-structure`)_  
+After each run, populates `run.skill_name`, `run.success`, `run.error` from the response,
+then writes four files into `<run_num>/`:
 
 - `response.md` — `CopilotResponse.message` (processed output only)
 - `meta.json` — `skill_name`, `success`, `error`, `returncode`, `include_skill`,
@@ -155,8 +155,7 @@ After each run, write four files into `<run_num>/`:
 - `stdout.txt` — `CopilotResponse.stdout_raw`
 - `stderr.txt` — `CopilotResponse.stderr_raw` (contains token/timing lines)
 
-Raw output goes to plain text files rather than into `meta.json` to keep the JSON
-clean and machine-readable. Plain text is also easier to inspect when debugging a run.
+`import json` added to `take_evaluation.py`.
 
 ---
 
@@ -165,21 +164,21 @@ clean and machine-readable. Plain text is also easier to inspect when debugging 
 ```
 model-fix-none-assessment   ✅
 fix-cwd-bug                 ✅
-  └─ conditional-copy
+  └─ conditional-copy       ✅
 
 model-eval-name             ✅
   └─ evals-json-eval-name  ✅
-  └─ output-dir-structure
+  └─ output-dir-structure  ✅
 
 model-run-fields            ✅
-  └─ write-response-file
+  └─ write-response-file   ✅
 
 wire-results-dir            ✅
   └─ args-tuple-refactor   ✅
-       └─ output-dir-structure
-            └─ write-response-file
-            └─ copy-created-files
+       └─ output-dir-structure  ✅
+            └─ write-response-file  ✅
+            └─ copy-created-files  ✅
 
-snapshot-temp-dir           (no deps)
-  └─ copy-created-files
+snapshot-temp-dir           ✅
+  └─ copy-created-files     ✅
 ```

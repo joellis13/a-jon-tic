@@ -1,6 +1,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 import copy
+import json
 from pprint import pprint
 from pathlib import Path
 import shutil
@@ -53,8 +54,8 @@ def get_evals() -> SkillEvaluation :
 
     return skill_eval
 
-def run_prompt(task: RunTask, cwd: Path = PROJECT_ROOT) -> tuple[Evaluation, Run]:
-    """Run a single prompt and return the evaluation + run result."""
+def run_prompt(task: RunTask, cwd: Path = PROJECT_ROOT) -> tuple[Evaluation, Run, Path]:
+    """Run a single prompt and return the evaluation, run result, and output directory."""
     evaluation = task.evaluation
     run_index = task.run_index
     total_runs = task.total_runs
@@ -86,7 +87,11 @@ def run_prompt(task: RunTask, cwd: Path = PROJECT_ROOT) -> tuple[Evaluation, Run
     print("tokens_cached: " + str(response.tokens_cached))
     print("duration_seconds: " + str(response.duration_seconds))
     print("==================================================\n")
-    
+
+    skill_folder = "with_skill" if evaluation.include_skill else "without_skill"
+    run_dir = task.iteration_dir / evaluation.evaluation_name / skill_folder / str(run_index + 1)
+    run_dir.mkdir(parents=True, exist_ok=True)
+
     run = Run(
         id=run_index + 1,
         include_skill=evaluation.include_skill,
@@ -96,17 +101,49 @@ def run_prompt(task: RunTask, cwd: Path = PROJECT_ROOT) -> tuple[Evaluation, Run
         tokens_cached=response.tokens_cached,
         duration_seconds=response.duration_seconds,
         assessment=None,
+        skill_name=response.skill_name,
+        success=response.success,
+        error=response.error,
         files=[]
     )
-    
-    return evaluation, run
+
+    (run_dir / "response.md").write_text(response.message, encoding="utf-8")
+    (run_dir / "stdout.txt").write_text(response.stdout_raw, encoding="utf-8")
+    (run_dir / "stderr.txt").write_text(response.stderr_raw, encoding="utf-8")
+    (run_dir / "meta.json").write_text(json.dumps({
+        "skill_name":       response.skill_name,
+        "success":          response.success,
+        "error":            response.error,
+        "returncode":       response.returncode,
+        "include_skill":    evaluation.include_skill,
+        "tokens_input":     response.tokens_input,
+        "tokens_output":    response.tokens_output,
+        "tokens_cached":    response.tokens_cached,
+        "duration_seconds": response.duration_seconds,
+    }, indent=2), encoding="utf-8")
+
+    return evaluation, run, run_dir
 
 def run_prompt_in_temp_dir(task: RunTask) -> tuple[Evaluation, Run]:
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         shutil.copytree(GITHUB_DIR, tmp_path / GITHUB)
 
-        return run_prompt(task, cwd=tmp_path)
+        if not task.evaluation.include_skill:
+            shutil.rmtree(tmp_path / GITHUB / SKILLS / SKILL_NAME)
+
+        before = {f for f in tmp_path.rglob("*") if f.is_file()}
+
+        evaluation, run, run_dir = run_prompt(task, cwd=tmp_path)
+
+        after = {f for f in tmp_path.rglob("*") if f.is_file()}
+        for f in after - before:
+            dest = run_dir / f.relative_to(tmp_path)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(f, dest)
+            run.files.append(dest)
+
+        return evaluation, run
 
 def get_split_evaluations(evaluations: list[Evaluation]) -> list[ExtEvaluation]:
     split_evaluations = []
