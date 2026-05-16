@@ -1,6 +1,8 @@
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import copy
+import json
+import shutil
 from pprint import pprint
 from pathlib import Path
 
@@ -9,7 +11,21 @@ from evaluation_config import EvaluationConfig, EVALS, EVALS_JSON
 from evaluation_models import ExtEvaluation, SkillEvaluation, Evaluation, RunTask
 from evaluation_runner import EvaluationRunner
 from run_factory import RunFactory
-from run_directory_writer import RunDirectoryWriter, RESPONSE_FILE, BASELINE
+from run_directory_writer import RunDirectoryWriter, RESPONSE_FILE, BASELINE, META_FILE
+
+
+def _baseline_is_stale(eval_name: str, baseline_dir: Path, model: str, prompt: str) -> bool:
+    """Return True if the cached baseline was run with a different model or prompt."""
+    meta_path = baseline_dir / BASELINE / eval_name / "1" / META_FILE
+    if not meta_path.exists():
+        return False
+    with open(meta_path, encoding="utf-8") as f:
+        meta = json.load(f)
+    cached_model = meta.get("model")
+    cached_prompt = meta.get("prompt")
+    if cached_model is None or cached_prompt is None:
+        return False  # pre-feature meta; can't determine staleness, assume valid
+    return cached_model != model or cached_prompt != prompt
 
 
 def get_results_dir(config: EvaluationConfig) -> Path:
@@ -45,6 +61,11 @@ def run_prompts(evaluations: list[Evaluation], iteration_dir: Path, baseline_dir
     config = eval_runner.config
     tasks = []
     for evaluation in get_split_evaluations(evaluations):
+        if not evaluation.include_skill:
+            stale_dir = baseline_dir / BASELINE / evaluation.evaluation_name
+            if stale_dir.exists() and _baseline_is_stale(evaluation.evaluation_name, baseline_dir, config.model, evaluation.prompt):
+                shutil.rmtree(stale_dir)
+                print(f"[baseline] Stale baseline removed for '{evaluation.evaluation_name}' (model or prompt changed) — will rerun")
         for run_num in range(config.times):
             if not evaluation.include_skill:
                 run_dir = baseline_dir / BASELINE / evaluation.evaluation_name / str(run_num + 1)

@@ -66,19 +66,20 @@ class CopilotResponse:
 
         return obj
 
-    def format_summary(self, eval_id: int, run_index: int, total_runs: int, include_skill: bool) -> str:
+    def format_summary(self, eval_id: int, eval_name: str, prompt: str, run_index: int, total_runs: int, include_skill: bool) -> str:
         sep = "=" * 50
         return "\n".join([
             f"\n{sep}",
-            f"result {eval_id} (run {run_index + 1}/{total_runs}): ",
+            f"result {eval_id} — {eval_name} (run {run_index + 1}/{total_runs})",
+            f"prompt: {prompt}",
+            f"include_skill: {include_skill}",
             f"skill_name: {self.skill_name}",
             f"success: {self.success}",
             f"error: {self.error}",
-            f"include_skill: {include_skill}",
-            f"message: {self.message}",
             f"tokens_input: {self.tokens_input}",
             f"tokens_output: {self.tokens_output}",
             f"tokens_cached: {self.tokens_cached}",
             f"duration_seconds: {self.duration_seconds}",
+            f"message: {self.message}",
             f"{sep}\n",
         ])

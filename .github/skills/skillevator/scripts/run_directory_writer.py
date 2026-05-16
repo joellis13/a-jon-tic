@@ -18,11 +18,13 @@ class RunDirectoryWriter:
     Pure I/O — no business logic. Swap or subclass to vary serialization format.
     """
 
-    def write(self, run_dir: Path, response: CopilotResponse, evaluation: ExtEvaluation) -> None:
+    def write(self, run_dir: Path, response: CopilotResponse, evaluation: ExtEvaluation, model: str) -> None:
         (run_dir / RESPONSE_FILE).write_text(response.message, encoding="utf-8")
         (run_dir / STDOUT_FILE).write_text(response.stdout_raw, encoding="utf-8")
         (run_dir / STDERR_FILE).write_text(response.stderr_raw, encoding="utf-8")
         (run_dir / META_FILE).write_text(json.dumps({
+            "model":            model,
+            "prompt":           evaluation.prompt,
             "skill_name":       response.skill_name,
             "success":          response.success,
             "error":            response.error,
@@ -32,4 +34,4 @@ class RunDirectoryWriter:
             "tokens_output":    response.tokens_output,
             "tokens_cached":    response.tokens_cached,
             "duration_seconds": response.duration_seconds,
-        }, indent=2), encoding="utf-8")
+        }, indent=2, ensure_ascii=False), encoding="utf-8")
