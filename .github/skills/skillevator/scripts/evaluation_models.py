@@ -1,7 +1,12 @@
+from __future__ import annotations
+
 from dataclasses import asdict, dataclass, field
 import json
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
+
+if TYPE_CHECKING:
+    from evaluation_config import EvaluationConfig
 
 @dataclass
 class Assessment:
@@ -56,6 +61,7 @@ class RunTask:
     run_index: int
     total_runs: int
     iteration_dir: Path
+    config: EvaluationConfig  # carries config into executor.map workers
 
 
 @dataclass

@@ -8,29 +8,12 @@ import shutil
 import subprocess
 import tempfile
 
+from evaluation_config import EvaluationConfig, EVALS, EVALS_JSON
 from evaluation_models import ExtEvaluation, SkillEvaluation, Evaluation, Run, RunTask
 from copilot_models import CopilotResponse
 
-SKILL_NAME = ""
-SKILL_EVAL_RESULTS_DIR = ""
-CURRENT_WORKING_DIR = Path(__file__).resolve()
-SKILLEVATOR_ROOT = CURRENT_WORKING_DIR.parents[1]
-PROJECT_ROOT = CURRENT_WORKING_DIR.parents[4]
-GITHUB = ".github"
-SKILLS = "skills"
-GITHUB_DIR = PROJECT_ROOT / GITHUB
-SKILLS_DIR = PROJECT_ROOT / GITHUB / SKILLS
-EVALS = "evals"
-EVALUATIONS = "evaluations"
-EVALS_JSON = "evals.json"
-SKILLEVATOR_EVALUATIONS = SKILLEVATOR_ROOT / EVALUATIONS
-
-def set_skill_name(skill_name: str):
-    global SKILL_NAME
-    SKILL_NAME = skill_name
-
-def get_results_dir() -> Path:
-    skill_eval_dir = SKILLEVATOR_EVALUATIONS / SKILL_NAME
+def get_results_dir(config: EvaluationConfig) -> Path:
+    skill_eval_dir = config.skillevator_evaluations_dir / config.skill_name
     base_name = skill_eval_dir / "iteration"
     counter = 1
     while True:
@@ -41,27 +24,24 @@ def get_results_dir() -> Path:
             return directory_name
         counter += 1
 
-def setup_eval_location() -> Path:
-    skill_evaluation_directory = SKILLEVATOR_EVALUATIONS / SKILL_NAME
+def setup_eval_location(config: EvaluationConfig) -> Path:
+    skill_evaluation_directory = config.skillevator_evaluations_dir / config.skill_name
     skill_evaluation_directory.mkdir(parents=True, exist_ok=True)
     return skill_evaluation_directory / EVALS_JSON
 
-def get_evals() -> SkillEvaluation :
-    skill_dir = SKILLS_DIR / SKILL_NAME
-    skill_eval_file = skill_dir / EVALS / EVALS_JSON 
+def get_evals(config: EvaluationConfig) -> SkillEvaluation:
+    skill_eval_file = config.skills_dir / config.skill_name / EVALS / EVALS_JSON
+    return SkillEvaluation.from_json_file(skill_eval_file)
 
-    skill_eval = SkillEvaluation.from_json_file(skill_eval_file)
-
-    return skill_eval
-
-def run_prompt(task: RunTask, cwd: Path = PROJECT_ROOT) -> tuple[Evaluation, Run, Path]:
+def run_prompt(task: RunTask, cwd: Path) -> tuple[Evaluation, Run, Path]:
     """Run a single prompt and return the evaluation, run result, and output directory."""
     evaluation = task.evaluation
     run_index = task.run_index
     total_runs = task.total_runs
+    config = task.config
     eval_id = evaluation.id
     prompt = evaluation.prompt
-    command = "copilot --allow-tool=\"shell(python)\" --model gpt-4.1 -p \"" + prompt + "\""
+    command = f"copilot --allow-tool=\"{config.allowed_tools}\" --model {config.model} -p \"{prompt}\""
     print(f"[Run {run_index + 1}/{total_runs}] command {eval_id}: {command}")
 
     result = subprocess.run(
@@ -125,12 +105,13 @@ def run_prompt(task: RunTask, cwd: Path = PROJECT_ROOT) -> tuple[Evaluation, Run
     return evaluation, run, run_dir
 
 def run_prompt_in_temp_dir(task: RunTask) -> tuple[Evaluation, Run]:
+    config = task.config
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
-        shutil.copytree(GITHUB_DIR, tmp_path / GITHUB)
+        shutil.copytree(config.github_dir, tmp_path / ".github")
 
         if not task.evaluation.include_skill:
-            shutil.rmtree(tmp_path / GITHUB / SKILLS / SKILL_NAME)
+            shutil.rmtree(tmp_path / ".github" / "skills" / config.skill_name)
 
         before = {f for f in tmp_path.rglob("*") if f.is_file()}
 
@@ -155,14 +136,13 @@ def get_split_evaluations(evaluations: list[Evaluation]) -> list[ExtEvaluation]:
 
     return split_evaluations
 
-def run_prompts(evaluations: list[Evaluation], iteration_dir: Path, times: int = 3) -> list[Evaluation]:
+def run_prompts(evaluations: list[Evaluation], iteration_dir: Path, config: EvaluationConfig) -> list[Evaluation]:
     """Run each evaluation multiple times concurrently."""
     split_evaluations = get_split_evaluations(evaluations)
-    # Create tasks: RunTask for each evaluation × times
     tasks = [
-        RunTask(evaluation, run_num, times, iteration_dir)
+        RunTask(evaluation, run_num, config.times, iteration_dir, config)
         for evaluation in split_evaluations
-        for run_num in range(times)
+        for run_num in range(config.times)
     ]
     
     with ThreadPoolExecutor() as executor:
@@ -180,17 +160,16 @@ def run_prompts(evaluations: list[Evaluation], iteration_dir: Path, times: int =
     return evaluations
 
 def main():
-    skill_name = "hello-user"
-    set_skill_name(skill_name)
-    eval_location = setup_eval_location()
-    iteration_dir = get_results_dir()
-    skill_eval = get_evals()
+    config = EvaluationConfig(skill_name="hello-user")
+    eval_location = setup_eval_location(config)
+    iteration_dir = get_results_dir(config)
+    skill_eval = get_evals(config)
     evaluations = skill_eval.evaluations
-    evaluations_with_runs = run_prompts(evaluations, iteration_dir, times=3)
+    evaluations_with_runs = run_prompts(evaluations, iteration_dir, config)
     pprint([{"id": e.id, "runs_count": len(e.runs)} for e in evaluations_with_runs])
     updated_skill_eval = copy.deepcopy(skill_eval)
     updated_skill_eval.evaluations = evaluations_with_runs
 
-    SkillEvaluation.to_json_file(updated_skill_eval, eval_location)
+    updated_skill_eval.to_json_file(eval_location)
 
 main()
