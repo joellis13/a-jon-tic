@@ -9,7 +9,7 @@ class RunFactory:
     """
 
     @staticmethod
-    def create(response: CopilotResponse, evaluation: ExtEvaluation, run_index: int) -> Run:
+    def create(response: CopilotResponse, evaluation: ExtEvaluation, run_index: int, changes: dict) -> Run:
         return Run(
             id=run_index + 1,
             include_skill=evaluation.include_skill,
@@ -23,4 +23,5 @@ class RunFactory:
             skill_triggered=response.skill_name is not None,
             success=response.success,
             error=response.error,
+            changes=changes,
         )

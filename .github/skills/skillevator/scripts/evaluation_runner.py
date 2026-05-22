@@ -2,8 +2,9 @@ import shutil
 import tempfile
 from pathlib import Path
 
+import file_tracker
 from command_runner import CopilotCommandRunner
-from evaluation_config import EvaluationConfig
+from evaluation_config import EvaluationConfig, EVALS
 from evaluation_models import Evaluation, Run, RunTask
 from run_factory import RunFactory
 from run_directory_writer import RunDirectoryWriter, BASELINE
@@ -50,19 +51,28 @@ class EvaluationRunner:
             if not evaluation.include_skill:
                 shutil.rmtree(tmp_path / ".github" / "skills" / self.config.skill_name)
 
-            before = {f for f in tmp_path.rglob("*") if f.is_file()}
+            for rel_path in evaluation.seed_files:
+                src = self.config.skills_dir / self.config.skill_name / EVALS / evaluation.evaluation_name / rel_path
+                dest = tmp_path / rel_path
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dest)
+
+            before = file_tracker.snapshot(tmp_path)
 
             print(f"[Run {run_index + 1}/{total_runs}] command {evaluation.id}: {self._runner.build_command(prompt)}")
             response = self._runner.run(prompt, tmp_path)
             print(response.format_summary(evaluation.id, evaluation.evaluation_name, evaluation.prompt, run_index, total_runs, evaluation.include_skill))
 
-            run = self._factory.create(response, evaluation, run_index)
-            self._writer.write(run_dir, response, evaluation, self.config.model, self.config.allowed_tools)
+            after = file_tracker.snapshot(tmp_path)
+            changes = file_tracker.compute_changes(before, after)
 
-            after = {f for f in tmp_path.rglob("*") if f.is_file()}
-            for f in after - before:
-                dest = run_dir / f.relative_to(tmp_path)
+            run = self._factory.create(response, evaluation, run_index, changes)
+            self._writer.write(run_dir, response, evaluation, self.config.model, self.config.allowed_tools, changes)
+
+            for rel_path in changes["created"] + changes["modified"]:
+                src = tmp_path / rel_path
+                dest = run_dir / rel_path
                 dest.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(f, dest)
+                shutil.copy2(src, dest)
 
         return evaluation, run

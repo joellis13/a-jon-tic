@@ -32,6 +32,7 @@ class Run:
     skill_triggered: Optional[bool] = None
     success: Optional[bool] = None
     error: Optional[str] = None
+    changes: Optional[dict] = None
 
 @dataclass
 class Evaluation:
@@ -40,6 +41,7 @@ class Evaluation:
     prompt: str
     general_expectation: str
     criteria: list[Criterion]
+    seed_files: list[str] = field(default_factory=list)
     with_skill_runs: list[Run] = field(default_factory=list)
     baseline_runs:   list[Run] = field(default_factory=list)
 
@@ -97,6 +99,7 @@ class SkillEvaluation:
                     prompt=e["prompt"],
                     general_expectation=e["general_expectation"],
                     criteria=[Criterion(**c) for c in e.get("criteria", [])],
+                    seed_files=e.get("seed_files", []),
                     with_skill_runs=_parse_runs(e, include_skill=True,  parse_run=parse_run),
                     baseline_runs=  _parse_runs(e, include_skill=False, parse_run=parse_run),
                 )
