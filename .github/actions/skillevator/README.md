@@ -4,24 +4,36 @@ Runs a skill's evaluations against the Copilot CLI and records the results.
 
 ## Usage
 
-Run from the **repository root**:
+### Locally (run from the **repository root**)
 
 ```bash
 # Minimal (no tools, hello-user skill, default model)
-python .github/skills/skillevator/scripts/take_evaluation.py
+python .github/actions/skillevator/scripts/take_evaluation.py
 
 # Typical — specify skill and allow a tool
-python .github/skills/skillevator/scripts/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)"
+python .github/actions/skillevator/scripts/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)"
 
 # Full options
-python .github/skills/skillevator/scripts/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)" --model gpt-4.1 --times 3 --timeout 120
+python .github/actions/skillevator/scripts/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)" --model gpt-4.1 --times 3 --timeout 120
 ```
 
 Pass `--allow-tool` once per tool. It mirrors the Copilot CLI flag directly.
 
 ```bash
 # Multiple tools
-python .github/skills/skillevator/scripts/take_evaluation.py --skill-name my-skill --allow-tool "shell(python)" --allow-tool "builtin"
+python .github/actions/skillevator/scripts/take_evaluation.py --skill-name my-skill --allow-tool "shell(python)" --allow-tool "builtin"
+```
+
+### In CI (GitHub Actions)
+
+```yaml
+- uses: ./.github/actions/skillevator
+  with:
+    skill-name: hello-user
+    model: gpt-4.1
+    times: 3
+    timeout: 120
+    allowed-tools: "shell(python) builtin"
 ```
 
 | Flag           | Required | Default      | Description                                               |
