@@ -14,8 +14,8 @@ from run_factory import RunFactory
 from run_directory_writer import RunDirectoryWriter, RESPONSE_FILE, BASELINE, META_FILE
 
 
-def _baseline_is_stale(eval_name: str, baseline_dir: Path, model: str, prompt: str, allowed_tools: list[str]) -> bool:
-    """Return True if the cached baseline was run with a different model, prompt, or allowed_tools."""
+def _baseline_is_stale(eval_name: str, baseline_dir: Path, model: str, prompt: str, allowed_tools: list[str], seed_files: list[str]) -> bool:
+    """Return True if the cached baseline was run with a different model, prompt, allowed_tools, or seed_files."""
     meta_path = baseline_dir / BASELINE / eval_name / "1" / META_FILE
     if not meta_path.exists():
         return False
@@ -26,7 +26,8 @@ def _baseline_is_stale(eval_name: str, baseline_dir: Path, model: str, prompt: s
     if cached_model is None or cached_prompt is None:
         return False  # pre-feature meta; can't determine staleness, assume valid
     cached_tools = meta.get("allowed_tools")
-    return cached_model != model or cached_prompt != prompt or cached_tools != allowed_tools
+    cached_seeds = meta.get("seed_files")
+    return cached_model != model or cached_prompt != prompt or cached_tools != allowed_tools or cached_seeds != seed_files
 
 
 def get_results_dir(config: EvaluationConfig) -> Path:
@@ -64,9 +65,9 @@ def run_prompts(evaluations: list[Evaluation], iteration_dir: Path, baseline_dir
     for evaluation in get_split_evaluations(evaluations):
         if not evaluation.include_skill:
             stale_dir = baseline_dir / BASELINE / evaluation.evaluation_name
-            if stale_dir.exists() and _baseline_is_stale(evaluation.evaluation_name, baseline_dir, config.model, evaluation.prompt, config.allowed_tools):
+            if stale_dir.exists() and _baseline_is_stale(evaluation.evaluation_name, baseline_dir, config.model, evaluation.prompt, config.allowed_tools, evaluation.seed_files):
                 shutil.rmtree(stale_dir)
-                print(f"[baseline] Stale baseline removed for '{evaluation.evaluation_name}' (model or prompt changed) — will rerun")
+                print(f"[baseline] Stale baseline removed for '{evaluation.evaluation_name}' (model, prompt, tools, or seed_files changed) — will rerun")
         for run_num in range(config.times):
             if not evaluation.include_skill:
                 run_dir = baseline_dir / BASELINE / evaluation.evaluation_name / str(run_num + 1)

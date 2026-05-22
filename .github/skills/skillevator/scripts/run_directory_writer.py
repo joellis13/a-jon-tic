@@ -34,6 +34,7 @@ class RunDirectoryWriter:
             "error":            response.error,
             "returncode":       response.returncode,
             "include_skill":    evaluation.include_skill,
+            "seed_files":       evaluation.seed_files,
             "tokens_input":     response.tokens_input,
             "tokens_output":    response.tokens_output,
             "tokens_cached":    response.tokens_cached,
