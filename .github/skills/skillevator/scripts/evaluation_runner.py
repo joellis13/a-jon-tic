@@ -66,6 +66,12 @@ class EvaluationRunner:
             after = file_tracker.snapshot(tmp_path)
             changes = file_tracker.compute_changes(before, after)
 
+            for rel_path in changes["modified"]:
+                seed_src = self.config.skills_dir / self.config.skill_name / EVALS / evaluation.evaluation_name / rel_path
+                changes["diffs"][rel_path] = file_tracker.generate_diff(seed_src, tmp_path / rel_path)
+            for rel_path in changes["created"]:
+                changes["diffs"][rel_path] = file_tracker.generate_creation_diff(tmp_path / rel_path)
+
             run = self._factory.create(response, evaluation, run_index, changes)
             self._writer.write(run_dir, response, evaluation, self.config.model, self.config.allowed_tools, changes)
 
