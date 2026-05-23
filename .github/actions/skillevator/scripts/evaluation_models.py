@@ -9,9 +9,16 @@ if TYPE_CHECKING:
     from evaluation_config import EvaluationConfig
 
 @dataclass
+class CriterionResult:
+    id: int
+    criterion: str   # copied from the Criterion definition for self-contained records
+    passed: bool     # the LLM's binary verdict for this criterion
+    evidence: str    # the LLM's supporting quote or observation
+
+@dataclass
 class Assessment:
-    grade: int
-    feedback: str
+    passed: bool                             # all(r.passed for r in criteria_results) — always derived
+    criteria_results: list[CriterionResult]  # one entry per Criterion
 
 @dataclass
 class Criterion:
@@ -88,7 +95,12 @@ class SkillEvaluation:
     @classmethod
     def from_dict(cls, data: dict) -> "SkillEvaluation":
         def parse_run(r: dict) -> Run:
-            return Run(**{**r, "assessment": Assessment(**r["assessment"]) if r.get("assessment") else None})
+            def parse_assessment(a: dict) -> Assessment:
+                return Assessment(
+                    passed=a["passed"],
+                    criteria_results=[CriterionResult(**cr) for cr in a.get("criteria_results", [])],
+                )
+            return Run(**{**r, "assessment": parse_assessment(r["assessment"]) if r.get("assessment") else None})
 
         return cls(
             skill_name=data["skill_name"],

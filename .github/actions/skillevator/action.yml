@@ -40,3 +40,12 @@ runs:
           args+=(--allow-tool "$tool")
         done
         python "${{ github.action_path }}/scripts/take_evaluation.py" "${args[@]}"
+
+    - name: Assess evaluations
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: |
+        python "${{ github.action_path }}/scripts/take_assessment.py" \
+          --skill-name "${{ inputs.skill-name }}" \
+          --model "${{ inputs.model }}" \
+          --timeout 60
