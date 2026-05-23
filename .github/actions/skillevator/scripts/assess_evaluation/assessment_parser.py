@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "common"))
 
-from ..common.evaluation_models import Assessment, CriterionResult, Evaluation
+from evaluation_models import Assessment, CriterionResult, Evaluation
 
 
 def parse_assessment(raw_stdout: str, evaluation: Evaluation) -> Assessment:

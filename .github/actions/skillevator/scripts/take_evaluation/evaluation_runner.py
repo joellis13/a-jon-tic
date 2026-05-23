@@ -6,9 +6,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "common"))
 
 import file_tracker
-from ..common.command_runner import CopilotCommandRunner
-from ..common.evaluation_config import EvaluationConfig, EVALS
-from ..common.evaluation_models import Evaluation, Run, RunTask
+from command_runner import CopilotCommandRunner
+from evaluation_config import EvaluationConfig, EVALS
+from evaluation_models import Evaluation, Run, RunTask
 from run_factory import RunFactory
 from run_directory_writer import RunDirectoryWriter, BASELINE
 

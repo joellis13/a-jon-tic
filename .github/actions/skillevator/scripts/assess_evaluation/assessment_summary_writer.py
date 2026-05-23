@@ -7,8 +7,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "common"))
 
-from ..common.evaluation_config import EvaluationConfig
-from ..common.evaluation_models import SkillEvaluation
+from evaluation_config import EvaluationConfig
+from evaluation_models import SkillEvaluation
 
 ASSESSMENT_SUMMARY_JSON = "assessment_summary.json"
 
