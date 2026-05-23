@@ -3,15 +3,18 @@
 Each task runs in a fresh temporary directory that contains no skill folder,
 so the skill being judged cannot influence its own verdict.
 """
+import sys
 import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "common"))
+
 from assessment_parser import parse_assessment
-from command_runner import CopilotCommandRunner
-from evaluation_config import EvaluationConfig
-from evaluation_models import Evaluation, Run
+from ..common.command_runner import CopilotCommandRunner
+from ..common.evaluation_config import EvaluationConfig
+from ..common.evaluation_models import Evaluation, Run
 from grading_prompt_builder import build_grading_prompt
 
 

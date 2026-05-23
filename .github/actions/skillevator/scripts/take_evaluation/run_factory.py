@@ -1,5 +1,10 @@
-from copilot_models import CopilotResponse
-from evaluation_models import ExtEvaluation, Run
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "common"))
+
+from ..common.copilot_models import CopilotResponse
+from ..common.evaluation_models import ExtEvaluation, Run
 
 
 class RunFactory:

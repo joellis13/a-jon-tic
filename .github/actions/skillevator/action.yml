@@ -39,13 +39,13 @@ runs:
         for tool in ${{ inputs.allowed-tools }}; do
           args+=(--allow-tool "$tool")
         done
-        python "${{ github.action_path }}/scripts/take_evaluation.py" "${args[@]}"
+        python "${{ github.action_path }}/scripts/take_evaluation/take_evaluation.py" "${args[@]}"
 
     - name: Assess evaluations
       shell: bash
       working-directory: ${{ github.workspace }}
       run: |
-        python "${{ github.action_path }}/scripts/assess_evaluation.py" \
+        python "${{ github.action_path }}/scripts/assess_evaluation/assess_evaluation.py" \
           --skill-name "${{ inputs.skill-name }}" \
           --model "${{ inputs.model }}" \
           --timeout 60

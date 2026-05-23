@@ -11,33 +11,33 @@ assesses each run using the Copilot CLI as an LLM judge.
 
 ```bash
 # Minimal (no tools, hello-user skill, default model)
-python .github/actions/skillevator/scripts/take_evaluation.py
+python .github/actions/skillevator/scripts/take_evaluation/take_evaluation.py
 
 # Typical — specify skill and allow a tool
-python .github/actions/skillevator/scripts/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)"
+python .github/actions/skillevator/scripts/take_evaluation/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)"
 
 # Full options
-python .github/actions/skillevator/scripts/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)" --model gpt-4.1 --times 3 --timeout 120
+python .github/actions/skillevator/scripts/take_evaluation/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)" --model gpt-4.1 --times 3 --timeout 120
 ```
 
 Pass `--allow-tool` once per tool. It mirrors the Copilot CLI flag directly.
 
 ```bash
 # Multiple tools
-python .github/actions/skillevator/scripts/take_evaluation.py --skill-name my-skill --allow-tool "shell(python)" --allow-tool "builtin"
+python .github/actions/skillevator/scripts/take_evaluation/take_evaluation.py --skill-name my-skill --allow-tool "shell(python)" --allow-tool "builtin"
 ```
 
 **Step 2 — Assess evaluations** (grades each run, writes `assessment_summary.json`):
 
 ```bash
 # Minimal
-python .github/actions/skillevator/scripts/assess_evaluation.py
+python .github/actions/skillevator/scripts/assess_evaluation/assess_evaluation.py
 
 # Typical
-python .github/actions/skillevator/scripts/assess_evaluation.py --skill-name hello-user --model gpt-4.1
+python .github/actions/skillevator/scripts/assess_evaluation/assess_evaluation.py --skill-name hello-user --model gpt-4.1
 
 # Re-grade runs that already have an assessment
-python .github/actions/skillevator/scripts/assess_evaluation.py --skill-name hello-user --force
+python .github/actions/skillevator/scripts/assess_evaluation/assess_evaluation.py --skill-name hello-user --force
 ```
 
 ### In CI (GitHub Actions)
@@ -165,18 +165,19 @@ pass rates, and the with-skill vs. baseline delta across all evaluations.
 
 ## Module Map
 
-| File                           | Responsibility                                                       |
-| ------------------------------ | -------------------------------------------------------------------- |
-| `take_evaluation.py`           | Taker CLI entrypoint; wires dependencies; orchestrates runs          |
-| `assess_evaluation.py`         | Grader CLI entrypoint; wires dependencies; orchestrates grading      |
-| `evaluation_config.py`         | `EvaluationConfig` dataclass; all path resolution                    |
-| `command_runner.py`            | `CopilotCommandRunner`; owns `subprocess`                            |
-| `copilot_models.py`            | `CopilotResponse`; parses CLI stdout/stderr                          |
-| `run_factory.py`               | `RunFactory`; builds `Run` from response — no I/O                    |
-| `run_directory_writer.py`      | `RunDirectoryWriter`; writes output files — no logic                 |
-| `evaluation_runner.py`         | `EvaluationRunner`; per-task taker orchestrator                      |
-| `grading_prompt_builder.py`    | Builds grading prompt string — pure function, no I/O                 |
-| `assessment_parser.py`         | Parses LLM response → `Assessment` — pure function, no I/O           |
-| `assessment_runner.py`         | `AssessmentRunner`; per-task grader orchestrator                     |
-| `assessment_summary_writer.py` | Computes stats; writes `assessment_summary.json`                     |
-| `evaluation_models.py`         | Data models: `Evaluation`, `Run`, `Assessment`, `CriterionResult`, … |
+| File                                                   | Responsibility                                                       |
+| ------------------------------------------------------ | -------------------------------------------------------------------- |
+| `take_evaluation/take_evaluation.py`                   | Taker CLI entrypoint; wires dependencies; orchestrates runs          |
+| `take_evaluation/evaluation_runner.py`                 | `EvaluationRunner`; per-task taker orchestrator                      |
+| `take_evaluation/run_factory.py`                       | `RunFactory`; builds `Run` from response — no I/O                    |
+| `take_evaluation/run_directory_writer.py`              | `RunDirectoryWriter`; writes output files — no logic                 |
+| `take_evaluation/file_tracker.py`                      | Snapshots filesystem; diffs before/after for change tracking         |
+| `assess_evaluation/assess_evaluation.py`               | Grader CLI entrypoint; wires dependencies; orchestrates grading      |
+| `assess_evaluation/assessment_runner.py`               | `AssessmentRunner`; per-task grader orchestrator                     |
+| `assess_evaluation/assessment_parser.py`               | Parses LLM response → `Assessment` — pure function, no I/O           |
+| `assess_evaluation/assessment_summary_writer.py`       | Computes stats; writes `assessment_summary.json`                     |
+| `assess_evaluation/grading_prompt_builder.py`          | Builds grading prompt string — pure function, no I/O                 |
+| `common/evaluation_config.py`                          | `EvaluationConfig` dataclass; all path resolution                    |
+| `common/evaluation_models.py`                          | Data models: `Evaluation`, `Run`, `Assessment`, `CriterionResult`, … |
+| `common/command_runner.py`                             | `CopilotCommandRunner`; owns `subprocess`                            |
+| `common/copilot_models.py`                             | `CopilotResponse`; parses CLI stdout/stderr                          |

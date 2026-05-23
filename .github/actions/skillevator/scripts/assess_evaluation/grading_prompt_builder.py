@@ -2,7 +2,12 @@
 
 No I/O, no side effects — deterministic given the same inputs.
 """
-from evaluation_models import Evaluation, Run
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "common"))
+
+from ..common.evaluation_models import Evaluation, Run
 
 _DIFF_CHAR_LIMIT = 2000
 

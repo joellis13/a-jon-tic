@@ -6,13 +6,16 @@ produces assessment_summary.json alongside it.
 """
 import argparse
 import copy
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "common"))
 
 from assessment_runner import AssessmentRunner, AssessmentTask
 from assessment_summary_writer import write_summary
-from command_runner import CopilotCommandRunner
-from evaluation_config import EvaluationConfig, EVALS_JSON
-from evaluation_models import SkillEvaluation
+from ..common.command_runner import CopilotCommandRunner
+from ..common.evaluation_config import EvaluationConfig, EVALS_JSON
+from ..common.evaluation_models import SkillEvaluation
 
 
 def _load_skill_eval(config: EvaluationConfig) -> tuple[SkillEvaluation, Path]:

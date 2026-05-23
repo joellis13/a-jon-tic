@@ -5,8 +5,12 @@ every run always receives an Assessment — failures are visible, not silent.
 """
 import json
 import re
+import sys
+from pathlib import Path
 
-from evaluation_models import Assessment, CriterionResult, Evaluation
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "common"))
+
+from ..common.evaluation_models import Assessment, CriterionResult, Evaluation
 
 
 def parse_assessment(raw_stdout: str, evaluation: Evaluation) -> Assessment:

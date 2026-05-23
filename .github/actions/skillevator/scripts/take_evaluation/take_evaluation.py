@@ -3,12 +3,15 @@ from concurrent.futures import ThreadPoolExecutor
 import copy
 import json
 import shutil
-from pprint import pprint
+import sys
 from pathlib import Path
+from pprint import pprint
 
-from command_runner import CopilotCommandRunner
-from evaluation_config import EvaluationConfig, EVALS, EVALS_JSON
-from evaluation_models import ExtEvaluation, SkillEvaluation, Evaluation, RunTask
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "common"))
+
+from ..common.command_runner import CopilotCommandRunner
+from ..common.evaluation_config import EvaluationConfig, EVALS, EVALS_JSON
+from ..common.evaluation_models import ExtEvaluation, SkillEvaluation, Evaluation, RunTask
 from evaluation_runner import EvaluationRunner
 from run_factory import RunFactory
 from run_directory_writer import RunDirectoryWriter, RESPONSE_FILE, BASELINE, META_FILE

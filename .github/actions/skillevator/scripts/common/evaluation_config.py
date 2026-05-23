@@ -26,7 +26,7 @@ class EvaluationConfig:
 
     def __post_init__(self):
         _here = Path(__file__).resolve()
-        self.skillevator_root             = _here.parent.parent                          # scripts/ -> skillevator/
+        self.skillevator_root             = _here.parent.parent.parent                   # common/ -> scripts/ -> skillevator/
         self.project_root                 = self.skillevator_root.parent.parent.parent   # -> skills/ -> .github/ -> root/
         self.github_dir                   = self.project_root / _GITHUB
         self.skills_dir                   = self.project_root / _GITHUB / _SKILLS

@@ -1,11 +1,14 @@
 """Compute per-evaluation and roll-up assessment statistics; write assessment_summary.json."""
 import json
+import sys
 from datetime import datetime, timezone
 from math import sqrt
 from pathlib import Path
 
-from evaluation_config import EvaluationConfig
-from evaluation_models import SkillEvaluation
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "common"))
+
+from ..common.evaluation_config import EvaluationConfig
+from ..common.evaluation_models import SkillEvaluation
 
 ASSESSMENT_SUMMARY_JSON = "assessment_summary.json"
 
