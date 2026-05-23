@@ -54,13 +54,13 @@ Both steps run automatically — the action runs the taker then the grader:
     allowed-tools: "shell(python) builtin"
 ```
 
-| Flag             | Required | Default      | Description                                               |
-| ---------------- | -------- | ------------ | --------------------------------------------------------- |
-| `--allow-tool`   | no       | _(none)_     | Tool to allow; repeat for multiple (mirrors Copilot CLI)  |
-| `--skill-name`   | no       | `hello-user` | Skill directory name under `.github/skills/`              |
-| `--model`        | no       | `gpt-4.1`    | Copilot model passed to `--model`                         |
-| `--times`        | no       | `3`          | Number of runs per evaluation prompt (taker only)         |
-| `--timeout`      | no       | `120`        | Seconds before a taker CLI call is killed                 |
+| Flag           | Required | Default      | Description                                              |
+| -------------- | -------- | ------------ | -------------------------------------------------------- |
+| `--allow-tool` | no       | _(none)_     | Tool to allow; repeat for multiple (mirrors Copilot CLI) |
+| `--skill-name` | no       | `hello-user` | Skill directory name under `.github/skills/`             |
+| `--model`      | no       | `gpt-4.1`    | Copilot model passed to `--model`                        |
+| `--times`      | no       | `3`          | Number of runs per evaluation prompt (taker only)        |
+| `--timeout`    | no       | `120`        | Seconds before a taker CLI call is killed                |
 
 The grader's timeout is fixed at 60 s (grading calls return short JSON, no tool use).
 
@@ -143,7 +143,7 @@ After all tasks complete, `evals.json` is written once (single atomic write), th
 
 Each `Run` in `evals.json` gains an `assessment` block:
 
-```json
+````json
 {
   "passed": true,
   "criteria_results": [
@@ -155,7 +155,7 @@ Each `Run` in `evals.json` gains an `assessment` block:
     }
   ]
 }
-```
+````
 
 `assessment.passed` is always derived (`all(criteria_results[i].passed)`) — never
 assigned by the LLM.
@@ -165,19 +165,18 @@ pass rates, and the with-skill vs. baseline delta across all evaluations.
 
 ## Module Map
 
-| File                          | Responsibility                                                        |
-| ----------------------------- | --------------------------------------------------------------------- |
-| `take_evaluation.py`          | Taker CLI entrypoint; wires dependencies; orchestrates runs           |
-| `take_assessment.py`          | Grader CLI entrypoint; wires dependencies; orchestrates grading       |
-| `evaluation_config.py`        | `EvaluationConfig` dataclass; all path resolution                     |
-| `command_runner.py`           | `CopilotCommandRunner`; owns `subprocess`                             |
-| `copilot_models.py`           | `CopilotResponse`; parses CLI stdout/stderr                           |
-| `run_factory.py`              | `RunFactory`; builds `Run` from response — no I/O                     |
-| `run_directory_writer.py`     | `RunDirectoryWriter`; writes output files — no logic                  |
-| `evaluation_runner.py`        | `EvaluationRunner`; per-task taker orchestrator                       |
-| `grading_prompt_builder.py`   | Builds grading prompt string — pure function, no I/O                  |
-| `assessment_parser.py`        | Parses LLM response → `Assessment` — pure function, no I/O           |
-| `assessment_runner.py`        | `AssessmentRunner`; per-task grader orchestrator                      |
-| `assessment_summary_writer.py`| Computes stats; writes `assessment_summary.json`                      |
-| `evaluation_models.py`        | Data models: `Evaluation`, `Run`, `Assessment`, `CriterionResult`, …  |
-
+| File                           | Responsibility                                                       |
+| ------------------------------ | -------------------------------------------------------------------- |
+| `take_evaluation.py`           | Taker CLI entrypoint; wires dependencies; orchestrates runs          |
+| `take_assessment.py`           | Grader CLI entrypoint; wires dependencies; orchestrates grading      |
+| `evaluation_config.py`         | `EvaluationConfig` dataclass; all path resolution                    |
+| `command_runner.py`            | `CopilotCommandRunner`; owns `subprocess`                            |
+| `copilot_models.py`            | `CopilotResponse`; parses CLI stdout/stderr                          |
+| `run_factory.py`               | `RunFactory`; builds `Run` from response — no I/O                    |
+| `run_directory_writer.py`      | `RunDirectoryWriter`; writes output files — no logic                 |
+| `evaluation_runner.py`         | `EvaluationRunner`; per-task taker orchestrator                      |
+| `grading_prompt_builder.py`    | Builds grading prompt string — pure function, no I/O                 |
+| `assessment_parser.py`         | Parses LLM response → `Assessment` — pure function, no I/O           |
+| `assessment_runner.py`         | `AssessmentRunner`; per-task grader orchestrator                     |
+| `assessment_summary_writer.py` | Computes stats; writes `assessment_summary.json`                     |
+| `evaluation_models.py`         | Data models: `Evaluation`, `Run`, `Assessment`, `CriterionResult`, … |

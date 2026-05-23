@@ -48,12 +48,16 @@ class CopilotResponse:
 
         obj.success = result.returncode == 0
 
-        # Parse tokens from stderr(Tokens    ↑ 96.2k • ↓ 109 • 13.3k (cached))
-        tokens_match = re.search(r'Tokens\s+↑\s+([\d.]+k?)\s*•\s*↓\s+([\d.]+k?)\s*•\s+([\d.]+k?)', result.stderr)
+        # Parse tokens from stderr. Format: "Tokens    ↑ 96.2k • ↓ 109 • 13.3k (cached)"
+        # The cached group (third •-separated value) is absent when there is no cache hit.
+        tokens_match = re.search(
+            r'Tokens\s+↑\s+([\d.]+k?)\s*•\s*↓\s+([\d.]+k?)(?:\s*•\s*([\d.]+k?))?',
+            result.stderr,
+        )
         if tokens_match:
             obj.tokens_input  = _parse_token_count(tokens_match.group(1))
             obj.tokens_output = _parse_token_count(tokens_match.group(2))
-            obj.tokens_cached = _parse_token_count(tokens_match.group(3))
+            obj.tokens_cached = _parse_token_count(tokens_match.group(3)) if tokens_match.group(3) else None
 
         # Parse duration from stderr (Requests  0 Premium (15s))
         duration_match = re.search(r'\((\d+(?:\.\d+)?)s\)', result.stderr)
