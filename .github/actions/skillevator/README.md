@@ -31,13 +31,13 @@ python .github/actions/skillevator/scripts/take_evaluation.py --skill-name my-sk
 
 ```bash
 # Minimal
-python .github/actions/skillevator/scripts/take_assessment.py
+python .github/actions/skillevator/scripts/assess_evaluation.py
 
 # Typical
-python .github/actions/skillevator/scripts/take_assessment.py --skill-name hello-user --model gpt-4.1
+python .github/actions/skillevator/scripts/assess_evaluation.py --skill-name hello-user --model gpt-4.1
 
 # Re-grade runs that already have an assessment
-python .github/actions/skillevator/scripts/take_assessment.py --skill-name hello-user --force
+python .github/actions/skillevator/scripts/assess_evaluation.py --skill-name hello-user --force
 ```
 
 ### In CI (GitHub Actions)
@@ -75,7 +75,7 @@ take_evaluation.py          ← Step 1: run skill prompts
 │   → evaluations/<skill>/evals.json      (runs appended; assessment: null)
 │
 ▼
-take_assessment.py          ← Step 2: grade each run independently
+assess_evaluation.py          ← Step 2: grade each run independently
     → evaluations/<skill>/evals.json              (assessment fields populated)
     → evaluations/<skill>/assessment_summary.json (pass rates, delta, per-criterion stats)
 ```
@@ -116,10 +116,10 @@ take_evaluation.py
 After all tasks complete, results are aggregated back into the `SkillEvaluation`
 and written to `evaluations/<skill>/evals.json`.
 
-### Grader (`take_assessment.py`)
+### Grader (`assess_evaluation.py`)
 
 ```text
-take_assessment.py
+assess_evaluation.py
 │
 ├── parse_args()            ← resolve --skill-name / --model / --timeout / --force
 ├── EvaluationConfig        ← reused from taker; same path resolution
@@ -168,7 +168,7 @@ pass rates, and the with-skill vs. baseline delta across all evaluations.
 | File                           | Responsibility                                                       |
 | ------------------------------ | -------------------------------------------------------------------- |
 | `take_evaluation.py`           | Taker CLI entrypoint; wires dependencies; orchestrates runs          |
-| `take_assessment.py`           | Grader CLI entrypoint; wires dependencies; orchestrates grading      |
+| `assess_evaluation.py`         | Grader CLI entrypoint; wires dependencies; orchestrates grading      |
 | `evaluation_config.py`         | `EvaluationConfig` dataclass; all path resolution                    |
 | `command_runner.py`            | `CopilotCommandRunner`; owns `subprocess`                            |
 | `copilot_models.py`            | `CopilotResponse`; parses CLI stdout/stderr                          |
