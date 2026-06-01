@@ -6,3 +6,5 @@ __pycache__/
 venv
 .venv
 .env
+.github/skills/jira-issue/scripts/response.json
+.github/skills/confluence-page/scripts/response.json
