@@ -17,7 +17,7 @@ python .github/actions/skillevator/scripts/take_evaluation/take_evaluation.py
 python .github/actions/skillevator/scripts/take_evaluation/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)"
 
 # Full options
-python .github/actions/skillevator/scripts/take_evaluation/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)" --model gpt-4.1 --times 3 --timeout 120
+python .github/actions/skillevator/scripts/take_evaluation/take_evaluation.py --skill-name hello-user --allow-tool "shell(python)" --model claude-haiku-4.5 --times 3 --timeout 120
 ```
 
 Pass `--allow-tool` once per tool. It mirrors the Copilot CLI flag directly.
@@ -34,7 +34,7 @@ python .github/actions/skillevator/scripts/take_evaluation/take_evaluation.py --
 python .github/actions/skillevator/scripts/assess_evaluation/assess_evaluation.py
 
 # Typical
-python .github/actions/skillevator/scripts/assess_evaluation/assess_evaluation.py --skill-name hello-user --model gpt-4.1
+python .github/actions/skillevator/scripts/assess_evaluation/assess_evaluation.py --skill-name hello-user --model claude-haiku-4.5
 
 # Re-grade runs that already have an assessment
 python .github/actions/skillevator/scripts/assess_evaluation/assess_evaluation.py --skill-name hello-user --force
@@ -48,19 +48,19 @@ Both steps run automatically — the action runs the taker then the grader:
 - uses: ./.github/actions/skillevator
   with:
     skill-name: hello-user
-    model: gpt-4.1
+    model: claude-haiku-4.5
     times: 3
     timeout: 120
     allowed-tools: "shell(python) builtin"
 ```
 
-| Flag           | Required | Default      | Description                                              |
-| -------------- | -------- | ------------ | -------------------------------------------------------- |
-| `--allow-tool` | no       | _(none)_     | Tool to allow; repeat for multiple (mirrors Copilot CLI) |
-| `--skill-name` | no       | `hello-user` | Skill directory name under `.github/skills/`             |
-| `--model`      | no       | `gpt-4.1`    | Copilot model passed to `--model`                        |
-| `--times`      | no       | `3`          | Number of runs per evaluation prompt (taker only)        |
-| `--timeout`    | no       | `120`        | Seconds before a taker CLI call is killed                |
+| Flag           | Required | Default            | Description                                              |
+| -------------- | -------- | ------------------ | -------------------------------------------------------- |
+| `--allow-tool` | no       | _(none)_           | Tool to allow; repeat for multiple (mirrors Copilot CLI) |
+| `--skill-name` | no       | `hello-user`       | Skill directory name under `.github/skills/`             |
+| `--model`      | no       | `claude-haiku-4.5` | Copilot model passed to `--model`                        |
+| `--times`      | no       | `3`                | Number of runs per evaluation prompt (taker only)        |
+| `--timeout`    | no       | `120`              | Seconds before a taker CLI call is killed                |
 
 The grader's timeout is fixed at 60 s (grading calls return short JSON, no tool use).
 
@@ -165,19 +165,19 @@ pass rates, and the with-skill vs. baseline delta across all evaluations.
 
 ## Module Map
 
-| File                                                   | Responsibility                                                       |
-| ------------------------------------------------------ | -------------------------------------------------------------------- |
-| `take_evaluation/take_evaluation.py`                   | Taker CLI entrypoint; wires dependencies; orchestrates runs          |
-| `take_evaluation/evaluation_runner.py`                 | `EvaluationRunner`; per-task taker orchestrator                      |
-| `take_evaluation/run_factory.py`                       | `RunFactory`; builds `Run` from response — no I/O                    |
-| `take_evaluation/run_directory_writer.py`              | `RunDirectoryWriter`; writes output files — no logic                 |
-| `take_evaluation/file_tracker.py`                      | Snapshots filesystem; diffs before/after for change tracking         |
-| `assess_evaluation/assess_evaluation.py`               | Grader CLI entrypoint; wires dependencies; orchestrates grading      |
-| `assess_evaluation/assessment_runner.py`               | `AssessmentRunner`; per-task grader orchestrator                     |
-| `assess_evaluation/assessment_parser.py`               | Parses LLM response → `Assessment` — pure function, no I/O           |
-| `assess_evaluation/assessment_summary_writer.py`       | Computes stats; writes `assessment_summary.json`                     |
-| `assess_evaluation/grading_prompt_builder.py`          | Builds grading prompt string — pure function, no I/O                 |
-| `common/evaluation_config.py`                          | `EvaluationConfig` dataclass; all path resolution                    |
-| `common/evaluation_models.py`                          | Data models: `Evaluation`, `Run`, `Assessment`, `CriterionResult`, … |
-| `common/command_runner.py`                             | `CopilotCommandRunner`; owns `subprocess`                            |
-| `common/copilot_models.py`                             | `CopilotResponse`; parses CLI stdout/stderr                          |
+| File                                             | Responsibility                                                       |
+| ------------------------------------------------ | -------------------------------------------------------------------- |
+| `take_evaluation/take_evaluation.py`             | Taker CLI entrypoint; wires dependencies; orchestrates runs          |
+| `take_evaluation/evaluation_runner.py`           | `EvaluationRunner`; per-task taker orchestrator                      |
+| `take_evaluation/run_factory.py`                 | `RunFactory`; builds `Run` from response — no I/O                    |
+| `take_evaluation/run_directory_writer.py`        | `RunDirectoryWriter`; writes output files — no logic                 |
+| `take_evaluation/file_tracker.py`                | Snapshots filesystem; diffs before/after for change tracking         |
+| `assess_evaluation/assess_evaluation.py`         | Grader CLI entrypoint; wires dependencies; orchestrates grading      |
+| `assess_evaluation/assessment_runner.py`         | `AssessmentRunner`; per-task grader orchestrator                     |
+| `assess_evaluation/assessment_parser.py`         | Parses LLM response → `Assessment` — pure function, no I/O           |
+| `assess_evaluation/assessment_summary_writer.py` | Computes stats; writes `assessment_summary.json`                     |
+| `assess_evaluation/grading_prompt_builder.py`    | Builds grading prompt string — pure function, no I/O                 |
+| `common/evaluation_config.py`                    | `EvaluationConfig` dataclass; all path resolution                    |
+| `common/evaluation_models.py`                    | Data models: `Evaluation`, `Run`, `Assessment`, `CriterionResult`, … |
+| `common/command_runner.py`                       | `CopilotCommandRunner`; owns `subprocess`                            |
+| `common/copilot_models.py`                       | `CopilotResponse`; parses CLI stdout/stderr                          |

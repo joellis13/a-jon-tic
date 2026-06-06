@@ -111,7 +111,7 @@ def _print_console_summary(skill_eval: SkillEvaluation) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Assess skill evaluation runs using the Copilot CLI as an LLM judge.")
     parser.add_argument("--skill-name", default="hello-user", help="Name of the skill to assess")
-    parser.add_argument("--model",      default="gpt-4.1",    help="Copilot model to use for grading")
+    parser.add_argument("--model",      default="claude-haiku-4.5",    help="Copilot model to use for grading")
     parser.add_argument("--timeout",    type=int, default=60, help="Seconds before a grading call is killed (default: 60)")
     parser.add_argument("--force",      action="store_true",  help="Re-grade runs that already have an assessment")
     return parser.parse_args()

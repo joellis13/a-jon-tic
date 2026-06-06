@@ -97,7 +97,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skill-name",  default="hello-user", help="Name of the skill to evaluate")
     parser.add_argument("--allow-tool",  dest="allowed_tools", action="append", default=[],
                         metavar="TOOL",  help="Tool to allow (repeat for multiple, e.g. --allow-tool shell(python))")
-    parser.add_argument("--model",       default="gpt-4.1",    help="Copilot model to use")
+    parser.add_argument("--model",       default="claude-haiku-4.5",    help="Copilot model to use")
     parser.add_argument("--times",   type=int, default=3,   help="Number of runs per evaluation")
     parser.add_argument("--timeout", type=int, default=120, help="Seconds before a CLI call is killed (default: 120)")
     return parser.parse_args()

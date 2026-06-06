@@ -63,7 +63,7 @@ def run_eval(skill: str, prompts: list[str], include_skills: bool) -> list[dict]
 def _run_prompts(prompts, cwd, label) -> list[dict]:
     results = []
     for prompt in prompts:
-        cmd = f'copilot --model gpt-4.1 -p "{prompt}"'
+        cmd = f'copilot --model claude-haiku-4.5 -p "{prompt}"'
         result = subprocess.run(
             cmd,
             capture_output=True,

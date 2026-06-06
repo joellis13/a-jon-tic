@@ -1,30 +1,30 @@
-name: 'Skillevator'
-description: 'Runs a skill''s evaluations against the Copilot CLI and records the results.'
+name: "Skillevator"
+description: "Runs a skill's evaluations against the Copilot CLI and records the results."
 
 inputs:
   skill-name:
-    description: 'Skill directory name under .github/skills/'
+    description: "Skill directory name under .github/skills/"
     required: false
-    default: 'hello-user'
+    default: "hello-user"
   model:
-    description: 'Copilot model to use'
+    description: "Copilot model to use"
     required: false
-    default: 'gpt-4.1'
+    default: "claude-haiku-4.5"
   times:
-    description: 'Number of runs per evaluation prompt'
+    description: "Number of runs per evaluation prompt"
     required: false
-    default: '3'
+    default: "3"
   timeout:
-    description: 'Seconds before a CLI call is killed'
+    description: "Seconds before a CLI call is killed"
     required: false
-    default: '120'
+    default: "120"
   allowed-tools:
     description: 'Space-separated tools to allow (e.g. "shell(python) builtin"). Mirrors --allow-tool.'
     required: false
-    default: ''
+    default: ""
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Run evaluations
       shell: bash
